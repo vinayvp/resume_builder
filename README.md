@@ -6,7 +6,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![RenderCV](https://img.shields.io/badge/RenderCV-v2.3%2B-orange.svg)](https://github.com/sinaatalay/rendercv)
 [![Typst](https://img.shields.io/badge/Typst-Compiler-239DAD.svg?logo=typst&logoColor=white)](https://typst.app/)
-[![Tests](https://img.shields.io/badge/Pytest-11%2F11%20Passed-brightgreen.svg?logo=pytest&logoColor=white)](tests/)
+[![Tests](https://img.shields.io/badge/Pytest-12%2F12%20Passed-brightgreen.svg?logo=pytest&logoColor=white)](tests/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Code Style](https://img.shields.io/badge/Code%20Style-Black-000000.svg)](https://github.com/psf/black)
 
@@ -101,7 +101,8 @@ The interface is engineered with a strict **viewport-locked (`100vh overflow-hid
 |  * Page Size: A4                   |  * [4] Analyze Metrics (37ms)      |  * Zoom In / Out / Fit        |
 |  * Phone Format: International     |  * [5] Visual Preview (1ms)        |  * Crisp multi-page PNGs      |
 |  * No Footer or Top Note: Checked  |  * [Terminal Log Toggle]           |  * Direct PDF Download link   |
-|  * Allow Entry Page Breaks: Yes    |                                    |                               |
+|  * Allow Entry Breaks: Yes         |                                    |                               |
+|  * Allow Section Breaks: Yes       |                                    |                               |
 +------------------------------------+------------------------------------+-------------------------------+
 | Made with ❤️ by Vinayak Pastey                                                                           |
 +---------------------------------------------------------------------------------------------------------+
@@ -159,6 +160,7 @@ The application ships with strict, professional defaults configured out of the b
 | **Header / Footer Notes** | **Disabled** | `show_page_numbering: false`, `show_last_updated_date: false` | Eliminates distracting footers and top notes |
 | **Phone Format** | **International** | `locale.phone_number_format: "international"` | Formats standard international dialing (`+1 609 999 9995`) |
 | **Entry Page Breaks** | **Enabled** | `design.entries.allow_page_break_in_entries: true` | Prevents awkward white gaps across page boundaries |
+| **Section Page Breaks** | **Enabled** | `design.entries.allow_page_break_in_sections: true` | Controls whether section entries split across pages |
 | **Filename Schema** | **Dynamic** | `VinayakPastey_Resume_<Role>_<Company>.pdf` | Structured naming for job application tracking |
 | **Save Destination** | **Auto-created** | `~/Documents/Globathon/Resumes` | Centralized folder for all generated resumes |
 
@@ -322,7 +324,7 @@ The repository includes a comprehensive, automated test suite covering unit oper
 python3 run_tests.py
 ```
 
-**Test Breakdown (11/11 Passed):**
+**Test Breakdown (12/12 Passed):**
 - `tests/test_analyzer.py`
   - `test_analyze_pdf_valid`: Verifies `pypdf` text extraction, word counts, and page distribution.
   - `test_analyze_pdf_nonexistent`: Tests graceful handling of missing files.
@@ -337,6 +339,7 @@ python3 run_tests.py
   - `test_build_filename_defaults`: Validates formatting: `VinayakPastey_Resume_<role>_<company>.pdf`.
   - `test_renderer_full_pipeline`: Tests live RenderCV CLI invocation and Typst compilation.
   - `test_renderer_invalid_yaml`: Confirms proper error containment on broken YAML syntax.
+  - `test_renderer_page_break_settings`: Validates independent control of entry and section page break flags.
 
 ### Running End-to-End Programmatic Verification
 

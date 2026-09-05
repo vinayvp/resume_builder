@@ -199,7 +199,7 @@
             </select>
           </div>
 
-          <!-- Toggles: No footer note & Entry page break -->
+          <!-- Toggles: No footer note, Entry page break & Section page break -->
           <div class="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
             <label class="relative flex items-center cursor-pointer select-none">
               <input type="checkbox" id="chkNoFooterNote" class="sr-only peer" checked>
@@ -211,11 +211,20 @@
             </label>
 
             <label class="relative flex items-center cursor-pointer select-none">
-              <input type="checkbox" id="chkAllowPageBreak" class="sr-only peer" checked>
+              <input type="checkbox" id="chkAllowPageBreak" class="sr-only peer" {% if default_allow_page_break_in_entries %}checked{% endif %}>
               <div class="w-8 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-emerald-600"></div>
               <div class="ml-2.5">
                 <span class="text-xs font-medium text-slate-700 dark:text-slate-300 block">Allow page break in entries</span>
-                <span class="text-[10px] text-slate-400 block">Permits clean split across pages</span>
+                <span class="text-[10px] text-slate-400 block">Splits a single entry across pages</span>
+              </div>
+            </label>
+
+            <label class="relative flex items-center cursor-pointer select-none">
+              <input type="checkbox" id="chkAllowSectionPageBreak" class="sr-only peer" {% if default_allow_page_break_in_sections %}checked{% endif %}>
+              <div class="w-8 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-emerald-600"></div>
+              <div class="ml-2.5">
+                <span class="text-xs font-medium text-slate-700 dark:text-slate-300 block">Allow page break in sections</span>
+                <span class="text-[10px] text-slate-400 block">Splits section entries across pages</span>
               </div>
             </label>
           </div>

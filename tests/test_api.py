@@ -36,7 +36,8 @@ def test_index_three_column_layout():
     assert "step-validate_input" in text
     assert "step-apply_design" in text
     assert "step-execute_cli" in text
-    assert "stepTickerText" in text
+    assert "chkAllowPageBreak" in text
+    assert "chkAllowSectionPageBreak" in text
     # Column 3: Interactive Preview
     assert "Interactive Preview" in text
 
@@ -49,6 +50,8 @@ def test_api_config():
     assert data["default_font"] == "Calibri"
     assert data["default_page_size"] == "a4"
     assert data["default_phone_format"] == "international"
+    assert data["default_allow_page_break_in_entries"] is True
+    assert data["default_allow_page_break_in_sections"] is True
 
 
 def test_api_sample():

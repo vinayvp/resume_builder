@@ -104,3 +104,31 @@ def test_renderer_invalid_yaml(tmp_path):
     assert res.error is not None
     assert res.steps[0].status == "failed"
 
+
+def test_renderer_page_break_settings(tmp_path):
+    from ruamel.yaml import YAML
+    renderer = ResumeRenderer(cache_dir=tmp_path)
+    sample_yaml = Path(__file__).resolve().parent.parent / "resume_builder" / "samples" / "sample_resume.yaml"
+    content = sample_yaml.read_text(encoding="utf-8")
+
+    design = DesignSettings(
+        theme="engineeringresumes",
+        font_family="Calibri",
+        page_size="a4",
+        allow_page_break_in_entries=False,
+        allow_page_break_in_sections=False,
+    )
+
+    res = renderer.render_resume(
+        yaml_content=content,
+        design=design,
+    )
+
+    assert res.success is True
+    # Verify input.yaml saved in session has the flags set to False
+    session_dir = tmp_path / res.token
+    y = YAML()
+    parsed = y.load((session_dir / "input.yaml").read_text(encoding="utf-8"))
+    assert parsed["design"]["entries"]["allow_page_break_in_entries"] is False
+    assert parsed["design"]["entries"]["allow_page_break_in_sections"] is False
+

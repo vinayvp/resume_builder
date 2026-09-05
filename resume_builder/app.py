@@ -26,6 +26,7 @@ from .config import (
     DEFAULT_FONT,
     DEFAULT_PHONE_FORMAT,
     DEFAULT_ALLOW_PAGE_BREAK_IN_ENTRIES,
+    DEFAULT_ALLOW_PAGE_BREAK_IN_SECTIONS,
     DEFAULT_SHOW_PAGE_NUMBERING,
     DEFAULT_SHOW_LAST_UPDATED_DATE,
     AVAILABLE_THEMES,
@@ -79,6 +80,8 @@ async def index(request: Request):
             "default_page_size": DEFAULT_PAGE_SIZE,
             "default_font": DEFAULT_FONT,
             "default_phone_format": DEFAULT_PHONE_FORMAT,
+            "default_allow_page_break_in_entries": DEFAULT_ALLOW_PAGE_BREAK_IN_ENTRIES,
+            "default_allow_page_break_in_sections": DEFAULT_ALLOW_PAGE_BREAK_IN_SECTIONS,
             "available_themes": AVAILABLE_THEMES,
             "available_fonts": AVAILABLE_FONTS,
             "available_page_sizes": AVAILABLE_PAGE_SIZES,
@@ -99,6 +102,8 @@ async def get_config():
         "default_font": DEFAULT_FONT,
         "default_phone_format": DEFAULT_PHONE_FORMAT,
         "default_allow_page_break": DEFAULT_ALLOW_PAGE_BREAK_IN_ENTRIES,
+        "default_allow_page_break_in_entries": DEFAULT_ALLOW_PAGE_BREAK_IN_ENTRIES,
+        "default_allow_page_break_in_sections": DEFAULT_ALLOW_PAGE_BREAK_IN_SECTIONS,
         "default_show_page_numbering": DEFAULT_SHOW_PAGE_NUMBERING,
         "default_show_last_updated": DEFAULT_SHOW_LAST_UPDATED_DATE,
         "available_themes": AVAILABLE_THEMES,
@@ -152,6 +157,7 @@ async def render_upload_endpoint(
     no_footer_or_top_note: bool = Form(True),
     phone_number_format: str = Form(DEFAULT_PHONE_FORMAT),
     allow_page_break_in_entries: bool = Form(DEFAULT_ALLOW_PAGE_BREAK_IN_ENTRIES),
+    allow_page_break_in_sections: bool = Form(DEFAULT_ALLOW_PAGE_BREAK_IN_SECTIONS),
 ):
     """
     Accepts uploaded YAML file multipart form and triggers render pipeline.
@@ -166,6 +172,7 @@ async def render_upload_endpoint(
         no_footer_or_top_note=no_footer_or_top_note,
         phone_number_format=phone_number_format,
         allow_page_break_in_entries=allow_page_break_in_entries,
+        allow_page_break_in_sections=allow_page_break_in_sections,
     )
 
     res = renderer.render_resume(

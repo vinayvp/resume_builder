@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const selPhoneFormat = document.getElementById("selPhoneFormat");
   const chkNoFooterNote = document.getElementById("chkNoFooterNote");
   const chkAllowPageBreak = document.getElementById("chkAllowPageBreak");
+  const chkAllowSectionPageBreak = document.getElementById("chkAllowSectionPageBreak");
 
   const yamlEditor = document.getElementById("yamlEditor");
   const yamlLineCount = document.getElementById("yamlLineCount");
@@ -411,6 +412,7 @@ document.addEventListener("DOMContentLoaded", () => {
         no_footer_or_top_note: chkNoFooterNote.checked,
         phone_number_format: selPhoneFormat.value,
         allow_page_break_in_entries: chkAllowPageBreak.checked,
+        allow_page_break_in_sections: chkAllowSectionPageBreak ? chkAllowSectionPageBreak.checked : true,
       },
     };
 

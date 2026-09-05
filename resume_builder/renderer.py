@@ -260,7 +260,7 @@ class ResumeRenderer:
             if "entries" not in data["design"] or not isinstance(data["design"]["entries"], dict):
                 data["design"]["entries"] = {}
             data["design"]["entries"]["allow_page_break_in_entries"] = design.allow_page_break_in_entries
-            data["design"]["entries"]["allow_page_break_in_sections"] = True
+            data["design"]["entries"]["allow_page_break_in_sections"] = design.allow_page_break_in_sections
 
             # Locale / Phone format
             if "locale" not in data or not isinstance(data["locale"], dict):

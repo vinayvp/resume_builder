@@ -11,6 +11,7 @@ from .config import (
     DEFAULT_FONT,
     DEFAULT_PHONE_FORMAT,
     DEFAULT_ALLOW_PAGE_BREAK_IN_ENTRIES,
+    DEFAULT_ALLOW_PAGE_BREAK_IN_SECTIONS,
     DEFAULT_SAVE_DIR,
 )
 
@@ -32,6 +33,10 @@ class DesignSettings(BaseModel):
     allow_page_break_in_entries: bool = Field(
         default=DEFAULT_ALLOW_PAGE_BREAK_IN_ENTRIES,
         description="Allow page breaks within entry descriptions"
+    )
+    allow_page_break_in_sections: bool = Field(
+        default=DEFAULT_ALLOW_PAGE_BREAK_IN_SECTIONS,
+        description="Allow page breaks across section entries"
     )
 
 
