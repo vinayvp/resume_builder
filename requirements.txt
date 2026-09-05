@@ -1,0 +1,12 @@
+rendercv[full]>=2.3.0
+click>=8.0.0
+pypdf>=5.0.0
+fastapi>=0.110.0
+uvicorn[standard]>=0.30.0
+jinja2>=3.1.0
+python-multipart>=0.0.9
+pyyaml>=6.0.0
+ruamel.yaml>=0.18.0
+pytest>=8.0.0
+httpx>=0.27.0
+

@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "resume_builder"
+version = "0.1.0"
+description = "Clean, minimal, modern UI for RenderCV resume generation with preview, analytics, and auto-saving"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "rendercv[full]>=2.3.0",
+    "click>=8.0.0",
+    "pypdf>=5.0.0",
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.30.0",
+    "jinja2>=3.1.0",
+    "python-multipart>=0.0.9",
+    "pyyaml>=6.0.0",
+    "ruamel.yaml>=0.18.0",
+]
+
+[project.scripts]
+resume-builder = "resume_builder.main:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+

@@ -1,0 +1,53 @@
+/* Modern, clean custom styling for resume_builder */
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.6);
+}
+
+/* Page Paper styling for rendered resume previews */
+.resume-page-sheet {
+  background: white;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  max-width: 100%;
+}
+
+.dark .resume-page-sheet {
+  border: 1px solid rgba(51, 65, 85, 0.6);
+  box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.5);
+}
+
+/* 1-Line Stepper Pills */
+.step-pill {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.step-pill.completed {
+  box-shadow: 0 1px 2px 0 rgba(16, 185, 129, 0.15);
+}
+
+.step-pill.running {
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35);
+}
+
+/* Subtle focus rings */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+}
