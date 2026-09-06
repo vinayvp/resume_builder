@@ -12,8 +12,23 @@ import sys
 import time
 import uuid
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 from ruamel.yaml import YAML
+
+# RenderCV Data Models for default configuration expansion
+try:
+    from rendercv.data.models import Locale, RenderCVSettings, available_theme_options
+except ImportError:
+    base_dir = Path(__file__).resolve().parent.parent
+    venv_site = base_dir / ".venv" / "lib" / f"python{sys.version_info.major}.{sys.version_info.minor}" / "site-packages"
+    if venv_site.exists() and str(venv_site) not in sys.path:
+        sys.path.insert(0, str(venv_site))
+    try:
+        from rendercv.data.models import Locale, RenderCVSettings, available_theme_options
+    except ImportError:
+        available_theme_options = None
+        Locale = None
+        RenderCVSettings = None
 
 from .analyzer import analyze_pdf
 from .config import (
@@ -22,6 +37,25 @@ from .config import (
     DEFAULT_SAVE_DIR,
 )
 from .models import DesignSettings, RenderResponse, SaveResponse, StepInfo
+
+
+def deep_merge(base: dict, override: dict) -> dict:
+    """
+    Recursively merges override dictionary into base dictionary.
+    Returns a new merged dictionary without mutating inputs.
+    """
+    if not isinstance(base, dict):
+        return override if isinstance(override, dict) else {}
+    if not isinstance(override, dict):
+        return dict(base) if isinstance(base, dict) else {}
+
+    merged = dict(base)
+    for key, value in override.items():
+        if key in merged and isinstance(merged[key], dict) and isinstance(value, dict):
+            merged[key] = deep_merge(merged[key], value)
+        else:
+            merged[key] = value
+    return merged
 
 
 def sanitize_name(name: str) -> str:
@@ -126,11 +160,40 @@ def resolve_save_path(save_dir: str, filename: str) -> Path:
     return Path(expanded) / filename
 
 
+def patch_rendercv_typst_template():
+    """
+    RenderCV 2.3 has an issue in Preamble.j2.typ where:
+    `if type(page.margin) == "dictionary"`
+    Typst 0.12+ evaluates `type(dict) == dictionary` as a type object,
+    not string "dictionary". When unequal margins are configured (e.g. top_margin != bottom_margin),
+    Typst falls through to `page.margin * 4` and fails with `cannot multiply dictionary with integer`.
+    This safely ensures the Jinja template handles both type representations across all themes.
+    """
+    try:
+        import rendercv
+        rcv_dir = Path(rendercv.__file__).parent / "themes"
+        if not rcv_dir.exists():
+            return
+        target_str = 'if type(page.margin) == "dictionary" {'
+        replacement_str = 'if type(page.margin) == dictionary or type(page.margin) == "dictionary" {'
+        for preamble in rcv_dir.glob("**/Preamble.j2.typ"):
+            content = preamble.read_text(encoding="utf-8")
+            if target_str in content:
+                content = content.replace(target_str, replacement_str)
+                preamble.write_text(content, encoding="utf-8")
+    except Exception:
+        pass
+
+
+patch_rendercv_typst_template()
+
+
 class ResumeRenderer:
     def __init__(self, cache_dir: Path = CACHE_DIR):
         self.cache_dir = cache_dir
         self.yaml = YAML()
         self.yaml.preserve_quotes = True
+        patch_rendercv_typst_template()
 
     def render_resume(
         self,
@@ -216,58 +279,95 @@ class ResumeRenderer:
             steps[0].message = f"Successfully parsed resume for '{data['cv'].get('name', 'Applicant')}'"
 
             # -------------------------------------------------------------
-            # STEP 2: Apply Design & Typography Settings
+            # STEP 2: Apply Design, Settings, Locale & Defaults
             # -------------------------------------------------------------
             t0 = time.perf_counter()
             steps[1].status = "running"
 
-            if "design" not in data or not isinstance(data["design"], dict):
-                data["design"] = {}
+            # 1. Expand Design Defaults from Theme
+            default_design = {}
+            if available_theme_options:
+                theme_cls = available_theme_options.get(design.theme)
+                if not theme_cls:
+                    theme_cls = available_theme_options.get("engineeringresumes")
+                if theme_cls:
+                    default_design = theme_cls().model_dump(mode="json", exclude_none=True)
 
-            # Theme
-            data["design"]["theme"] = design.theme
+            user_design = data.get("design")
+            if not isinstance(user_design, dict):
+                user_design = {}
 
-            # Page settings
-            if "page" not in data["design"] or not isinstance(data["design"]["page"], dict):
-                data["design"]["page"] = {}
-            data["design"]["page"]["size"] = design.page_size
+            merged_design = deep_merge(default_design, user_design)
+
+            # Apply UI Design overrides
+            merged_design["theme"] = design.theme
+
+            if "page" not in merged_design or not isinstance(merged_design["page"], dict):
+                merged_design["page"] = {}
+            merged_design["page"]["size"] = design.page_size
 
             # Footer / Top note handling
             if design.no_footer_or_top_note:
-                data["design"]["page"]["show_page_numbering"] = False
-                data["design"]["page"]["show_last_updated_date"] = False
+                merged_design["page"]["show_page_numbering"] = False
+                merged_design["page"]["show_last_updated_date"] = False
             else:
                 if design.show_page_numbering is not None:
-                    data["design"]["page"]["show_page_numbering"] = design.show_page_numbering
+                    merged_design["page"]["show_page_numbering"] = design.show_page_numbering
                 if design.show_last_updated_date is not None:
-                    data["design"]["page"]["show_last_updated_date"] = design.show_last_updated_date
+                    merged_design["page"]["show_last_updated_date"] = design.show_last_updated_date
 
             # Font settings (apply to all font slots)
-            if "text" not in data["design"] or not isinstance(data["design"]["text"], dict):
-                data["design"]["text"] = {}
-            data["design"]["text"]["font_family"] = design.font_family
+            if "text" not in merged_design or not isinstance(merged_design["text"], dict):
+                merged_design["text"] = {}
+            merged_design["text"]["font_family"] = design.font_family
 
-            if "header" not in data["design"] or not isinstance(data["design"]["header"], dict):
-                data["design"]["header"] = {}
-            data["design"]["header"]["name_font_family"] = design.font_family
-            data["design"]["header"]["connections_font_family"] = design.font_family
+            if "header" not in merged_design or not isinstance(merged_design["header"], dict):
+                merged_design["header"] = {}
+            merged_design["header"]["name_font_family"] = design.font_family
+            merged_design["header"]["connections_font_family"] = design.font_family
 
-            if "section_titles" not in data["design"] or not isinstance(data["design"]["section_titles"], dict):
-                data["design"]["section_titles"] = {}
-            data["design"]["section_titles"]["font_family"] = design.font_family
+            if "section_titles" not in merged_design or not isinstance(merged_design["section_titles"], dict):
+                merged_design["section_titles"] = {}
+            merged_design["section_titles"]["font_family"] = design.font_family
 
             # Entry page breaks
-            if "entries" not in data["design"] or not isinstance(data["design"]["entries"], dict):
-                data["design"]["entries"] = {}
-            data["design"]["entries"]["allow_page_break_in_entries"] = design.allow_page_break_in_entries
-            data["design"]["entries"]["allow_page_break_in_sections"] = design.allow_page_break_in_sections
+            if "entries" not in merged_design or not isinstance(merged_design["entries"], dict):
+                merged_design["entries"] = {}
+            merged_design["entries"]["allow_page_break_in_entries"] = design.allow_page_break_in_entries
+            merged_design["entries"]["allow_page_break_in_sections"] = design.allow_page_break_in_sections
 
-            # Locale / Phone format
-            if "locale" not in data or not isinstance(data["locale"], dict):
-                data["locale"] = {}
-            data["locale"]["phone_number_format"] = design.phone_number_format
+            data["design"] = merged_design
 
-            # Save modified YAML to session directory
+            # 2. Expand Locale Defaults
+            default_locale = {}
+            if Locale:
+                default_locale = Locale().model_dump(mode="json", exclude_none=True)
+
+            user_locale = data.get("locale")
+            if not isinstance(user_locale, dict):
+                user_locale = {}
+
+            merged_locale = deep_merge(default_locale, user_locale)
+            merged_locale["phone_number_format"] = design.phone_number_format
+            data["locale"] = merged_locale
+
+            # 3. Expand RenderCV Settings Defaults
+            default_settings = {}
+            if RenderCVSettings:
+                default_settings = RenderCVSettings().model_dump(mode="json", exclude_none=True)
+
+            user_raw_settings = data.pop("settings", {})
+            if not isinstance(user_raw_settings, dict):
+                user_raw_settings = {}
+            user_rcv_settings = data.get("rendercv_settings")
+            if not isinstance(user_rcv_settings, dict):
+                user_rcv_settings = {}
+
+            user_settings = deep_merge(user_raw_settings, user_rcv_settings)
+            merged_settings = deep_merge(default_settings, user_settings)
+            data["rendercv_settings"] = merged_settings
+
+            # Save modified YAML with all defaults populated to session directory
             input_yaml_path = session_dir / "input.yaml"
             with open(input_yaml_path, "w", encoding="utf-8") as f:
                 self.yaml.dump(data, f)

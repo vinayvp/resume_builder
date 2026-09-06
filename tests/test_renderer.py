@@ -132,3 +132,78 @@ def test_renderer_page_break_settings(tmp_path):
     assert parsed["design"]["entries"]["allow_page_break_in_entries"] is False
     assert parsed["design"]["entries"]["allow_page_break_in_sections"] is False
 
+
+def test_renderer_default_configs_expansion(tmp_path):
+    from ruamel.yaml import YAML
+    renderer = ResumeRenderer(cache_dir=tmp_path)
+
+    # Input YAML with minimal cv section and custom margin / custom bold keyword
+    custom_yaml = """
+cv:
+  name: Vinayak Pastey
+  location: Bengaluru, India
+design:
+  page:
+    top_margin: 1.5cm
+settings:
+  bold_keywords:
+    - Vinayak
+"""
+
+    design = DesignSettings(
+        theme="engineeringresumes",
+        font_family="Calibri",
+        page_size="a4",
+        no_footer_or_top_note=True,
+        phone_number_format="international",
+        allow_page_break_in_entries=False,
+    )
+
+    res = renderer.render_resume(
+        yaml_content=custom_yaml,
+        design=design,
+    )
+
+    assert res.success is True
+    session_dir = tmp_path / res.token
+    y = YAML()
+    parsed = y.load((session_dir / "input.yaml").read_text(encoding="utf-8"))
+
+    # 1. Check all design default blocks exist
+    assert "theme" in parsed["design"]
+    assert "page" in parsed["design"]
+    assert "colors" in parsed["design"]
+    assert "text" in parsed["design"]
+    assert "links" in parsed["design"]
+    assert "header" in parsed["design"]
+    assert "section_titles" in parsed["design"]
+    assert "entries" in parsed["design"]
+    assert "highlights" in parsed["design"]
+    assert "entry_types" in parsed["design"]
+
+    # User customization preserved
+    assert parsed["design"]["page"]["top_margin"] == "1.5cm"
+    # Other default page keys populated
+    assert parsed["design"]["page"]["bottom_margin"] == "2cm"
+    assert parsed["design"]["page"]["left_margin"] == "2cm"
+    # UI overrides applied
+    assert parsed["design"]["page"]["size"] == "a4"
+    assert parsed["design"]["page"]["show_page_numbering"] is False
+    assert parsed["design"]["entries"]["allow_page_break_in_entries"] is False
+
+    # 2. Check all locale default blocks exist
+    assert "locale" in parsed
+    assert parsed["locale"]["language"] == "en"
+    assert parsed["locale"]["phone_number_format"] == "international"
+    assert "page_numbering_template" in parsed["locale"]
+    assert "date_template" in parsed["locale"]
+    assert "months" in parsed["locale"]
+
+    # 3. Check rendercv_settings default blocks exist and user settings merged
+    assert "rendercv_settings" in parsed
+    assert "settings" not in parsed  # Pop/migrated cleanly
+    assert parsed["rendercv_settings"]["bold_keywords"] == ["Vinayak"]
+    assert "sort_entries" in parsed["rendercv_settings"]
+    assert "date" in parsed["rendercv_settings"]
+
+
