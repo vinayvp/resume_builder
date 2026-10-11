@@ -13,6 +13,7 @@ from .config import (
     DEFAULT_ALLOW_PAGE_BREAK_IN_ENTRIES,
     DEFAULT_ALLOW_PAGE_BREAK_IN_SECTIONS,
     DEFAULT_SAVE_DIR,
+    DEFAULT_COVER_LETTER_SAVE_DIR,
 )
 
 
@@ -44,8 +45,12 @@ class RenderRequest(BaseModel):
     yaml_content: str = Field(..., description="Raw YAML content of the resume")
     company_name: str = Field(default="", description="Target company name")
     role_name: str = Field(default="", description="Target role name")
-    custom_filename: Optional[str] = Field(default=None, description="Custom override for output filename")
+    custom_filename: Optional[str] = Field(default=None, description="Custom override for resume output filename")
+    custom_cover_letter_filename: Optional[str] = Field(default=None, description="Custom override for cover letter output filename")
     save_directory: str = Field(default=DEFAULT_SAVE_DIR, description="Directory where resume will be saved")
+    cover_letter_save_directory: str = Field(
+        default=DEFAULT_COVER_LETTER_SAVE_DIR, description="Directory where cover letter will be saved"
+    )
     design: DesignSettings = Field(default_factory=DesignSettings, description="Design and formatting preferences")
 
 
@@ -74,19 +79,31 @@ class RenderResponse(BaseModel):
     preview_urls: List[str] = Field(default_factory=list)
     pdf_preview_url: str = ""
     resolved_filename: str = ""
+    has_cover_letter: bool = False
+    cover_letter_preview_urls: List[str] = Field(default_factory=list)
+    cover_letter_pdf_url: str = ""
+    cover_letter_resolved_filename: str = ""
+    cover_letter_metrics: Optional[AnalysisResult] = None
     save_directory: str = ""
+    cover_letter_save_directory: str = ""
     cli_logs: str = ""
 
 
 class SaveRequest(BaseModel):
     token: str
     custom_filename: Optional[str] = None
+    custom_cover_letter_filename: Optional[str] = None
     save_directory: Optional[str] = None
+    cover_letter_save_directory: Optional[str] = None
+    save_resume: bool = True
+    save_cover_letter: bool = False
 
 
 class SaveResponse(BaseModel):
     success: bool
-    saved_path: str
+    saved_path: str = ""
+    saved_cover_letter_path: Optional[str] = None
     message: str
     error: Optional[str] = None
+
 

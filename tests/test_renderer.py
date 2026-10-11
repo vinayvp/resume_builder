@@ -125,12 +125,12 @@ def test_renderer_page_break_settings(tmp_path):
     )
 
     assert res.success is True
-    # Verify input.yaml saved in session has the flags set to False
+    # Verify input.yaml saved in session has the flags set to False in RenderCV 2.8+ schema
     session_dir = tmp_path / res.token
     y = YAML()
     parsed = y.load((session_dir / "input.yaml").read_text(encoding="utf-8"))
-    assert parsed["design"]["entries"]["allow_page_break_in_entries"] is False
-    assert parsed["design"]["entries"]["allow_page_break_in_sections"] is False
+    assert parsed["design"]["entries"]["allow_page_break"] is False
+    assert parsed["design"]["sections"]["allow_page_break"] is False
 
 
 def test_renderer_default_configs_expansion(tmp_path):
@@ -169,41 +169,96 @@ settings:
     y = YAML()
     parsed = y.load((session_dir / "input.yaml").read_text(encoding="utf-8"))
 
-    # 1. Check all design default blocks exist
+    # 1. Check all design default blocks exist for RenderCV 2.8+
     assert "theme" in parsed["design"]
     assert "page" in parsed["design"]
     assert "colors" in parsed["design"]
-    assert "text" in parsed["design"]
+    assert "typography" in parsed["design"]
     assert "links" in parsed["design"]
     assert "header" in parsed["design"]
     assert "section_titles" in parsed["design"]
+    assert "sections" in parsed["design"]
     assert "entries" in parsed["design"]
-    assert "highlights" in parsed["design"]
-    assert "entry_types" in parsed["design"]
+    assert "templates" in parsed["design"]
 
     # User customization preserved
     assert parsed["design"]["page"]["top_margin"] == "1.5cm"
-    # Other default page keys populated
-    assert parsed["design"]["page"]["bottom_margin"] == "2cm"
-    assert parsed["design"]["page"]["left_margin"] == "2cm"
     # UI overrides applied
     assert parsed["design"]["page"]["size"] == "a4"
-    assert parsed["design"]["page"]["show_page_numbering"] is False
-    assert parsed["design"]["entries"]["allow_page_break_in_entries"] is False
+    assert parsed["design"]["page"]["show_footer"] is False
+    assert parsed["design"]["page"]["show_top_note"] is False
+    assert parsed["design"]["entries"]["allow_page_break"] is False
+    assert parsed["design"]["typography"]["font_family"] == "Calibri"
+    assert parsed["design"]["header"]["connections"]["phone_number_format"] == "international"
 
-    # 2. Check all locale default blocks exist
-    assert "locale" in parsed
-    assert parsed["locale"]["language"] == "en"
-    assert parsed["locale"]["phone_number_format"] == "international"
-    assert "page_numbering_template" in parsed["locale"]
-    assert "date_template" in parsed["locale"]
-    assert "months" in parsed["locale"]
+    # 2. Check settings block exists and user settings merged cleanly
+    assert "settings" in parsed
+    assert "rendercv_settings" not in parsed  # Migrated cleanly
+    assert parsed["settings"]["bold_keywords"] == ["Vinayak"]
+    assert "current_date" in parsed["settings"]
 
-    # 3. Check rendercv_settings default blocks exist and user settings merged
-    assert "rendercv_settings" in parsed
-    assert "settings" not in parsed  # Pop/migrated cleanly
-    assert parsed["rendercv_settings"]["bold_keywords"] == ["Vinayak"]
-    assert "sort_entries" in parsed["rendercv_settings"]
-    assert "date" in parsed["rendercv_settings"]
+
+def test_renderer_with_cover_letter(tmp_path):
+    renderer = ResumeRenderer(cache_dir=tmp_path)
+    sample_yaml = Path(__file__).resolve().parent.parent / "resume_builder" / "samples" / "sample_resume.yaml"
+    content = sample_yaml.read_text(encoding="utf-8")
+
+    res = renderer.render_resume(
+        yaml_content=content,
+        company_name="Google",
+        role_name="Software Engineer",
+    )
+
+    assert res.success is True
+    assert res.has_cover_letter is True
+    assert len(res.preview_urls) >= 1
+    assert len(res.cover_letter_preview_urls) >= 1
+    assert res.cover_letter_pdf_url == f"/api/preview/{res.token}/cover-letter-pdf"
+    assert res.metrics is not None
+    assert res.metrics.page_count >= 1
+    assert res.cover_letter_metrics is not None
+    assert res.cover_letter_metrics.page_count >= 1
+    assert "Cover_Letter" in res.cover_letter_resolved_filename
+
+    # 1. Test saving resume only (default behavior when only save_resume is true)
+    save_res = renderer.save_resume(
+        token=res.token,
+        custom_filename=res.resolved_filename,
+        save_directory=str(tmp_path / "saved_resumes_only"),
+        save_resume=True,
+        save_cover_letter=False,
+    )
+    assert save_res.success is True
+    assert Path(save_res.saved_path).exists()
+    assert save_res.saved_cover_letter_path is None
+
+    # 2. Test saving cover letter only
+    save_cl_res = renderer.save_resume(
+        token=res.token,
+        custom_cover_letter_filename=res.cover_letter_resolved_filename,
+        cover_letter_save_directory=str(tmp_path / "saved_cl_only"),
+        save_resume=False,
+        save_cover_letter=True,
+    )
+    assert save_cl_res.success is True
+    assert save_cl_res.saved_path == ""
+    assert save_cl_res.saved_cover_letter_path is not None
+    assert Path(save_cl_res.saved_cover_letter_path).exists()
+
+    # 3. Test saving both resume and cover letter
+    save_both_res = renderer.save_resume(
+        token=res.token,
+        custom_filename=res.resolved_filename,
+        save_directory=str(tmp_path / "saved_both_resumes"),
+        custom_cover_letter_filename=res.cover_letter_resolved_filename,
+        cover_letter_save_directory=str(tmp_path / "saved_both_cls"),
+        save_resume=True,
+        save_cover_letter=True,
+    )
+    assert save_both_res.success is True
+    assert Path(save_both_res.saved_path).exists()
+    assert save_both_res.saved_cover_letter_path is not None
+    assert Path(save_both_res.saved_cover_letter_path).exists()
+
 
 

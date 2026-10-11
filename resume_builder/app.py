@@ -5,6 +5,7 @@ FastAPI application for resume_builder.
 from pathlib import Path
 import os
 import sys
+import time
 
 # Ensure local venv site-packages are loaded if running with system python
 venv_site = Path(__file__).resolve().parent.parent / ".venv" / "lib" / f"python{sys.version_info.major}.{sys.version_info.minor}" / "site-packages"
@@ -21,6 +22,7 @@ from .config import (
     BASE_DIR,
     CACHE_DIR,
     DEFAULT_SAVE_DIR,
+    DEFAULT_COVER_LETTER_SAVE_DIR,
     DEFAULT_THEME,
     DEFAULT_PAGE_SIZE,
     DEFAULT_FONT,
@@ -51,6 +53,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+@app.middleware("http")
+async def add_no_cache_header(request: Request, call_next):
+    response = await call_next(request)
+    if request.url.path == "/" or request.url.path.startswith("/static/"):
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+    return response
+
 # Setup directories
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 TEMPLATES_DIR = Path(__file__).resolve().parent / "templates"
@@ -75,7 +87,9 @@ async def index(request: Request):
         request=request,
         name="index.html",
         context={
+            "cache_buster": str(int(time.time())),
             "default_save_dir": DEFAULT_SAVE_DIR,
+            "default_cover_letter_save_dir": DEFAULT_COVER_LETTER_SAVE_DIR,
             "default_theme": DEFAULT_THEME,
             "default_page_size": DEFAULT_PAGE_SIZE,
             "default_font": DEFAULT_FONT,
@@ -97,6 +111,7 @@ async def get_config():
     """
     return {
         "default_save_dir": DEFAULT_SAVE_DIR,
+        "default_cover_letter_save_dir": DEFAULT_COVER_LETTER_SAVE_DIR,
         "default_theme": DEFAULT_THEME,
         "default_page_size": DEFAULT_PAGE_SIZE,
         "default_font": DEFAULT_FONT,
@@ -138,7 +153,9 @@ async def render_resume_endpoint(request: RenderRequest):
         company_name=request.company_name,
         role_name=request.role_name,
         custom_filename=request.custom_filename,
+        custom_cover_letter_filename=request.custom_cover_letter_filename,
         save_directory=request.save_directory,
+        cover_letter_save_directory=request.cover_letter_save_directory,
         design=request.design,
     )
     return res
@@ -197,6 +214,17 @@ async def get_preview_page(token: str, page_num: int):
     return FileResponse(image_path, media_type="image/png")
 
 
+@app.get("/api/preview/{token}/cover-letter-page/{page_num}")
+async def get_preview_cover_letter_page(token: str, page_num: int):
+    """
+    Serves the rendered PNG image for a specific cover letter page.
+    """
+    image_path = CACHE_DIR / token / f"cover_letter_page_{page_num}.png"
+    if not image_path.exists():
+        raise HTTPException(status_code=404, detail="Cover letter preview image not found")
+    return FileResponse(image_path, media_type="image/png")
+
+
 @app.get("/api/preview/{token}/pdf")
 async def get_preview_pdf(token: str):
     """
@@ -212,6 +240,21 @@ async def get_preview_pdf(token: str):
     )
 
 
+@app.get("/api/preview/{token}/cover-letter-pdf")
+async def get_preview_cover_letter_pdf(token: str):
+    """
+    Serves the rendered Cover Letter PDF file for download or direct browser viewing.
+    """
+    pdf_path = CACHE_DIR / token / "cover_letter.pdf"
+    if not pdf_path.exists():
+        raise HTTPException(status_code=404, detail="Cover letter PDF file not found")
+    return FileResponse(
+        pdf_path,
+        media_type="application/pdf",
+        filename="cover_letter.pdf",
+    )
+
+
 @app.post("/api/save", response_model=SaveResponse)
 async def save_resume_endpoint(request: SaveRequest):
     """
@@ -220,7 +263,11 @@ async def save_resume_endpoint(request: SaveRequest):
     res = renderer.save_resume(
         token=request.token,
         custom_filename=request.custom_filename,
+        custom_cover_letter_filename=request.custom_cover_letter_filename,
         save_directory=request.save_directory,
+        cover_letter_save_directory=request.cover_letter_save_directory,
+        save_resume=request.save_resume,
+        save_cover_letter=request.save_cover_letter,
     )
     if not res.success:
         raise HTTPException(status_code=400, detail=res.error or res.message)

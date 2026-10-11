@@ -11,9 +11,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // State
   let currentToken = null;
   let currentResolvedFilename = "";
+  let currentResolvedCoverLetterFilename = "";
   let isCustomFilenameActive = false;
   let customFilenameOverride = null;
-  let currentZoom = 100;
+  let isCustomCoverLetterFilenameActive = false;
+  let customCoverLetterFilenameOverride = null;
 
   // DOM Elements
   const companyInput = document.getElementById("companyName");
@@ -21,6 +23,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const lblFilenamePreview = document.getElementById("lblFilenamePreview");
   const btnEditFilename = document.getElementById("btnEditFilename");
   const saveDirectoryInput = document.getElementById("saveDirectory");
+
+  const lblCoverLetterFilenamePreview = document.getElementById("lblCoverLetterFilenamePreview");
+  const btnEditCoverLetterFilename = document.getElementById("btnEditCoverLetterFilename");
+  const coverLetterSaveDirectoryInput = document.getElementById("coverLetterSaveDirectory");
 
   const selTheme = document.getElementById("selTheme");
   const selFont = document.getElementById("selFont");
@@ -57,21 +63,55 @@ document.addEventListener("DOMContentLoaded", () => {
   const lblTargetLocation = document.getElementById("lblTargetLocation");
   const btnDownloadPdf = document.getElementById("btnDownloadPdf");
   const btnAcceptSave = document.getElementById("btnAcceptSave");
+  const lblSaveBtnText = document.getElementById("lblSaveBtnText");
+  const btnSaveBoth = document.getElementById("btnSaveBoth");
 
   const previewControls = document.getElementById("previewControls");
   const previewPageIndicator = document.getElementById("previewPageIndicator");
   const previewEmptyState = document.getElementById("previewEmptyState");
   const previewPagesContainer = document.getElementById("previewPagesContainer");
-  const zoomLevel = document.getElementById("zoomLevel");
-  const btnZoomIn = document.getElementById("btnZoomIn");
-  const btnZoomOut = document.getElementById("btnZoomOut");
-  const btnZoomFit = document.getElementById("btnZoomFit");
+  const btnFullscreenPreview = document.getElementById("btnFullscreenPreview");
+
+  // Full Screen Preview Modal DOM elements
+  const fullscreenPreviewModal = document.getElementById("fullscreenPreviewModal");
+  const fullscreenBackdrop = document.getElementById("fullscreenBackdrop");
+  const btnCloseFullscreenModal = document.getElementById("btnCloseFullscreenModal");
+  const fullscreenPreviewViewport = document.getElementById("fullscreenPreviewViewport");
+  const fullscreenPagesContainer = document.getElementById("fullscreenPagesContainer");
+  const fullscreenDocTitle = document.getElementById("fullscreenDocTitle");
+  const fullscreenDocPageBadge = document.getElementById("fullscreenDocPageBadge");
+  const fullscreenDocIcon = document.getElementById("fullscreenDocIcon");
+  const btnFullscreenDocToggle = document.getElementById("btnFullscreenDocToggle");
+  const fullscreenDocToggleIcon = document.getElementById("fullscreenDocToggleIcon");
+  const fullscreenDocToggleLabel = document.getElementById("fullscreenDocToggleLabel");
+  const btnFullscreenDownloadPdf = document.getElementById("btnFullscreenDownloadPdf");
+  const btnFullscreenZoomIn = document.getElementById("btnFullscreenZoomIn");
+  const btnFullscreenZoomOut = document.getElementById("btnFullscreenZoomOut");
+  const btnFullscreenZoomReset = document.getElementById("btnFullscreenZoomReset");
+  const fullscreenZoomLevel = document.getElementById("fullscreenZoomLevel");
 
   const successModal = document.getElementById("successModal");
+  const modalResumeGroup = document.getElementById("modalResumeGroup");
   const modalSavedPath = document.getElementById("modalSavedPath");
   const btnCopySavedPath = document.getElementById("btnCopySavedPath");
   const btnCloseModal = document.getElementById("btnCloseModal");
   const btnToggleTheme = document.getElementById("btnToggleTheme");
+
+  // Cover Letter DOM elements & state
+  const docTabSelector = document.getElementById("docTabSelector");
+  const tabResume = document.getElementById("tabResume");
+  const tabCoverLetter = document.getElementById("tabCoverLetter");
+  const tabResumeBadge = document.getElementById("tabResumeBadge");
+  const tabCoverLetterBadge = document.getElementById("tabCoverLetterBadge");
+  const lblDownloadBtn = document.getElementById("lblDownloadBtn");
+  const lblReviewTitle = document.getElementById("lblReviewTitle");
+  const metricPageWordsLabel = document.getElementById("metricPageWordsLabel");
+  const modalTitle = document.getElementById("modalTitle");
+  const modalCoverLetterGroup = document.getElementById("modalCoverLetterGroup");
+  const modalSavedCoverLetterPath = document.getElementById("modalSavedCoverLetterPath");
+
+  let activeDocTab = "resume";
+  let currentRenderData = null;
 
   // -------------------------------------------------------------
   // Theme Management (Light / Dark)
@@ -110,42 +150,64 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const updateFilenamePreview = () => {
-    if (isCustomFilenameActive && customFilenameOverride) {
-      currentResolvedFilename = customFilenameOverride;
-      lblFilenamePreview.textContent = currentResolvedFilename;
-      return;
-    }
-
     const role = sanitizeName(roleInput.value);
     const company = sanitizeName(companyInput.value);
 
-    let name = "VinayakPastey_Resume";
-    if (role && company) {
-      name += `_${role}_${company}`;
-    } else if (role) {
-      name += `_${role}`;
-    } else if (company) {
-      name += `_${company}`;
+    // Resume Filename
+    if (isCustomFilenameActive && customFilenameOverride) {
+      currentResolvedFilename = customFilenameOverride;
+    } else {
+      let name = "VinayakPastey_Resume";
+      if (role && company) {
+        name += `_${role}_${company}`;
+      } else if (role) {
+        name += `_${role}`;
+      } else if (company) {
+        name += `_${company}`;
+      }
+      name += ".pdf";
+      currentResolvedFilename = name;
     }
-    name += ".pdf";
+    if (lblFilenamePreview) {
+      lblFilenamePreview.textContent = currentResolvedFilename;
+      lblFilenamePreview.title = currentResolvedFilename;
+    }
 
-    currentResolvedFilename = name;
-    lblFilenamePreview.textContent = name;
-    lblFilenamePreview.title = name;
+    // Cover Letter Filename
+    if (isCustomCoverLetterFilenameActive && customCoverLetterFilenameOverride) {
+      currentResolvedCoverLetterFilename = customCoverLetterFilenameOverride;
+    } else {
+      let clName = "VinayakPastey_Cover_Letter";
+      if (role && company) {
+        clName += `_${role}_${company}`;
+      } else if (role) {
+        clName += `_${role}`;
+      } else if (company) {
+        clName += `_${company}`;
+      }
+      clName += ".pdf";
+      currentResolvedCoverLetterFilename = clName;
+    }
+    if (lblCoverLetterFilenamePreview) {
+      lblCoverLetterFilenamePreview.textContent = currentResolvedCoverLetterFilename;
+      lblCoverLetterFilenamePreview.title = currentResolvedCoverLetterFilename;
+    }
   };
 
   companyInput.addEventListener("input", () => {
     isCustomFilenameActive = false;
+    isCustomCoverLetterFilenameActive = false;
     updateFilenamePreview();
   });
 
   roleInput.addEventListener("input", () => {
     isCustomFilenameActive = false;
+    isCustomCoverLetterFilenameActive = false;
     updateFilenamePreview();
   });
 
   btnEditFilename.addEventListener("click", () => {
-    const custom = prompt("Enter custom filename:", currentResolvedFilename);
+    const custom = prompt("Enter custom Resume filename:", currentResolvedFilename);
     if (custom !== null && custom.trim() !== "") {
       let trimmed = custom.trim();
       if (!trimmed.toLowerCase().endsWith(".pdf")) trimmed += ".pdf";
@@ -154,6 +216,19 @@ document.addEventListener("DOMContentLoaded", () => {
       updateFilenamePreview();
     }
   });
+
+  if (btnEditCoverLetterFilename) {
+    btnEditCoverLetterFilename.addEventListener("click", () => {
+      const custom = prompt("Enter custom Cover Letter filename:", currentResolvedCoverLetterFilename);
+      if (custom !== null && custom.trim() !== "") {
+        let trimmed = custom.trim();
+        if (!trimmed.toLowerCase().endsWith(".pdf")) trimmed += ".pdf";
+        customCoverLetterFilenameOverride = trimmed;
+        isCustomCoverLetterFilenameActive = true;
+        updateFilenamePreview();
+      }
+    });
+  }
 
   updateFilenamePreview();
 
@@ -311,10 +386,14 @@ document.addEventListener("DOMContentLoaded", () => {
       pipelineStatusBadge.className = "inline-flex items-center px-2 py-0.2 text-[10px] font-medium rounded-full bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400";
     }
     if (metricsReviewCard) metricsReviewCard.classList.add("hidden");
+    if (btnSaveBoth) btnSaveBoth.classList.add("hidden");
+    if (lblSaveBtnText) lblSaveBtnText.textContent = "Save Resume";
     if (previewControls) previewControls.classList.add("opacity-40", "pointer-events-none");
     if (previewPagesContainer) previewPagesContainer.classList.add("hidden");
     if (previewEmptyState) previewEmptyState.classList.remove("hidden");
     if (previewPageIndicator) previewPageIndicator.textContent = "No document rendered";
+    currentRenderData = null;
+    activeDocTab = "resume";
   };
 
   const updateStepUI = (step, idx) => {
@@ -404,7 +483,9 @@ document.addEventListener("DOMContentLoaded", () => {
       company_name: companyInput.value.trim(),
       role_name: roleInput.value.trim(),
       custom_filename: isCustomFilenameActive ? customFilenameOverride : null,
+      custom_cover_letter_filename: isCustomCoverLetterFilenameActive ? customCoverLetterFilenameOverride : null,
       save_directory: saveDirectoryInput.value.trim(),
+      cover_letter_save_directory: coverLetterSaveDirectoryInput ? coverLetterSaveDirectoryInput.value.trim() : "~/Documents/Globathon/CoverLetters",
       design: {
         theme: selTheme.value,
         font_family: getSelectedFont(),
@@ -447,85 +528,49 @@ document.addEventListener("DOMContentLoaded", () => {
 
       currentToken = data.token;
       currentResolvedFilename = data.resolved_filename || currentResolvedFilename;
-      lblFilenamePreview.textContent = currentResolvedFilename;
+      if (lblFilenamePreview) lblFilenamePreview.textContent = currentResolvedFilename;
+
+      currentResolvedCoverLetterFilename = data.cover_letter_resolved_filename || currentResolvedCoverLetterFilename;
+      if (lblCoverLetterFilenamePreview) lblCoverLetterFilenamePreview.textContent = currentResolvedCoverLetterFilename;
 
       pipelineStatusBadge.textContent = "Rendered";
       pipelineStatusBadge.className = "inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300";
 
-      // -------------------------------------------------------------
-      // Populate Metrics
-      // -------------------------------------------------------------
-      if (data.metrics) {
-        const pages = data.metrics.page_count;
-        const totalWords = data.metrics.total_words;
+      currentRenderData = data;
 
-        metricPageCount.textContent = pages;
-        if (pages === 1) {
-          metricPageBadge.textContent = "Single Page";
-          metricPageBadge.className = "inline-block mt-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300";
-        } else {
-          metricPageBadge.textContent = `${pages} Pages`;
-          metricPageBadge.className = "inline-block mt-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300";
+      // Compute total pipeline render time from steps
+      const totalTime = data.steps.reduce((acc, s) => acc + (s.duration_ms || 0), 0);
+      metricRenderTime.textContent = `${Math.round(totalTime)} ms`;
+
+      if (data.has_cover_letter) {
+        if (tabResumeBadge) tabResumeBadge.textContent = `${data.metrics?.page_count || 1} pg`;
+        if (tabCoverLetterBadge) {
+          tabCoverLetterBadge.textContent = `${data.cover_letter_metrics?.page_count || 1} pg`;
+          tabCoverLetterBadge.className = "text-[9px] px-1.5 py-0.2 rounded-full bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300 font-medium";
         }
-
-        metricTotalWords.textContent = totalWords.toLocaleString();
-        const avgWords = Math.round(totalWords / Math.max(pages, 1));
-        metricWordDensity.textContent = `~${avgWords} words/page`;
-
-        if (data.metrics.page_words && data.metrics.page_words.length) {
-          const breakdown = data.metrics.page_words
-            .map((w, idx) => `P${idx + 1}: ${w}w`)
-            .join(" · ");
-          metricPageWords.textContent = breakdown;
-        }
-
-        // Compute total pipeline render time from steps
-        const totalTime = data.steps.reduce((acc, s) => acc + (s.duration_ms || 0), 0);
-        metricRenderTime.textContent = `${Math.round(totalTime)} ms`;
-
+        if (btnSaveBoth) btnSaveBoth.classList.remove("hidden");
         if (stepTickerText) {
-          stepTickerText.textContent = `✓ Complete in ${Math.round(totalTime)} ms (${pages} pg, ${totalWords.toLocaleString()} words)`;
+          stepTickerText.textContent = `✓ CV & Cover Letter rendered in ${Math.round(totalTime)} ms`;
         }
-        if (stepTickerDot) {
-          stepTickerDot.className = "w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0";
+      } else {
+        if (tabResumeBadge) tabResumeBadge.textContent = `${data.metrics?.page_count || 1} pg`;
+        if (tabCoverLetterBadge) {
+          tabCoverLetterBadge.textContent = "None";
+          tabCoverLetterBadge.className = "text-[9px] px-1.5 py-0.2 rounded-full bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500 font-medium";
         }
-
-        lblTargetLocation.textContent = `${saveDirectoryInput.value.trim()}/${currentResolvedFilename}`;
-        btnDownloadPdf.href = data.pdf_preview_url;
-
-        metricsReviewCard.classList.remove("hidden");
+        if (btnSaveBoth) btnSaveBoth.classList.add("hidden");
+        if (stepTickerText) {
+          stepTickerText.textContent = `✓ Complete in ${Math.round(totalTime)} ms (${data.metrics?.page_count || 1} pg, ${(data.metrics?.total_words || 0).toLocaleString()} words)`;
+        }
       }
 
-      // -------------------------------------------------------------
-      // Populate Preview Pages
-      // -------------------------------------------------------------
-      if (data.preview_urls && data.preview_urls.length) {
-        previewPagesContainer.innerHTML = "";
-        data.preview_urls.forEach((url, idx) => {
-          const pageWrapper = document.createElement("div");
-          pageWrapper.className = "relative flex flex-col items-center w-full max-w-[800px]";
-
-          const pageHeader = document.createElement("div");
-          pageHeader.className = "w-full flex items-center justify-between pb-1.5 px-1 text-[11px] text-slate-400 font-mono";
-          pageHeader.innerHTML = `<span>Page ${idx + 1} of ${data.preview_urls.length}</span><span>${data.metrics?.page_words?.[idx] || 0} words</span>`;
-
-          const img = document.createElement("img");
-          img.src = `${url}?t=${Date.now()}`;
-          img.alt = `Resume Page ${idx + 1}`;
-          img.className = "resume-page-sheet w-full";
-
-          pageWrapper.appendChild(pageHeader);
-          pageWrapper.appendChild(img);
-          previewPagesContainer.appendChild(pageWrapper);
-        });
-
-        previewEmptyState.classList.add("hidden");
-        previewPagesContainer.classList.remove("hidden");
-        previewControls.classList.remove("opacity-40", "pointer-events-none");
-        previewPageIndicator.textContent = `${data.preview_urls.length} page(s) ready`;
-        currentZoom = 100;
-        applyZoom();
+      if (stepTickerDot) {
+        stepTickerDot.className = "w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0";
       }
+
+      metricsReviewCard.classList.remove("hidden");
+      if (!activeDocTab) activeDocTab = "resume";
+      renderActiveDocumentView();
 
     } catch (err) {
       pipelineStatusBadge.textContent = "Network Error";
@@ -533,62 +578,425 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("Error invoking render: " + err.message);
     } finally {
       btnRenderResume.disabled = false;
-      lblRenderBtnText.textContent = "Render Resume";
+      lblRenderBtnText.textContent = "Render (CV & Cover Letter)";
       if (window.lucide) window.lucide.createIcons();
     }
   };
 
+  const updateTabButtonsUI = () => {
+    const isResume = activeDocTab === "resume";
+    if (tabResume && tabCoverLetter) {
+      if (isResume) {
+        tabResume.className = "cursor-pointer inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm border border-slate-200/60 dark:border-slate-700/60 transition-all";
+        tabCoverLetter.className = "cursor-pointer inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-md text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all";
+      } else {
+        tabResume.className = "cursor-pointer inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-md text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all";
+        tabCoverLetter.className = "cursor-pointer inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-white dark:bg-slate-900 text-teal-700 dark:text-teal-300 shadow-sm border border-slate-200/60 dark:border-slate-700/60 transition-all";
+      }
+    }
+  };
+
+  // Expose global tab switcher so it can be invoked via onclick or addEventListener
+  window.switchDocTab = (tab) => {
+    console.log("[ResumeBuilder] switchDocTab:", tab);
+    if (activeDocTab === tab && currentRenderData) {
+      if (fullscreenPreviewModal && !fullscreenPreviewModal.classList.contains("hidden")) {
+        updateFullscreenModalContent();
+      }
+      return;
+    }
+    if (tab === "cover_letter" && currentRenderData && !currentRenderData.has_cover_letter) {
+      alert("The rendered YAML does not contain a 'cover_letter:' section. Add a cover_letter block to your YAML to generate and preview a cover letter.");
+      return;
+    }
+    activeDocTab = tab;
+    updateTabButtonsUI();
+    renderActiveDocumentView();
+    if (fullscreenPreviewModal && !fullscreenPreviewModal.classList.contains("hidden")) {
+      updateFullscreenModalContent();
+    }
+  };
+
+  const renderActiveDocumentView = () => {
+    updateTabButtonsUI();
+
+    const isResume = activeDocTab === "resume";
+    const docTitle = isResume ? "Resume" : "Cover Letter";
+    const targetDir = isResume
+      ? saveDirectoryInput.value.trim()
+      : (coverLetterSaveDirectoryInput ? coverLetterSaveDirectoryInput.value.trim() : "~/Documents/Globathon/CoverLetters");
+    const resolvedName = isResume ? currentResolvedFilename : currentResolvedCoverLetterFilename;
+
+    if (lblReviewTitle) {
+      lblReviewTitle.textContent = isResume ? "Ready for Review (Resume)" : "Ready for Review (Cover Letter - Omega)";
+    }
+
+    if (lblTargetLocation) {
+      lblTargetLocation.textContent = `${targetDir}/${resolvedName}`;
+    }
+
+    if (lblDownloadBtn) {
+      lblDownloadBtn.textContent = isResume ? "Download Resume" : "Download Cover Letter";
+    }
+
+    if (lblSaveBtnText) {
+      lblSaveBtnText.textContent = isResume ? "Save Resume" : "Save Cover Letter";
+    }
+
+    if (!currentRenderData) {
+      if (previewEmptyState) {
+        const titleEl = previewEmptyState.querySelector("p.font-medium");
+        const subTitleEl = previewEmptyState.querySelector("p.text-xs");
+        if (titleEl) titleEl.textContent = `No ${docTitle} Rendered Yet`;
+        if (subTitleEl) {
+          subTitleEl.textContent = isResume
+            ? 'Click "Render (CV & Cover Letter)" below to start'
+            : 'Click "Render (CV & Cover Letter)" below to compile the Omega cover letter';
+        }
+      }
+      return;
+    }
+
+    const urls = isResume ? currentRenderData.preview_urls : currentRenderData.cover_letter_preview_urls;
+    const metrics = isResume ? currentRenderData.metrics : currentRenderData.cover_letter_metrics;
+
+    btnDownloadPdf.href = isResume ? currentRenderData.pdf_preview_url : currentRenderData.cover_letter_pdf_url;
+    btnDownloadPdf.download = resolvedName;
+
+    // Populate Metrics
+    if (metrics) {
+      const pages = metrics.page_count;
+      const totalWords = metrics.total_words;
+
+      metricPageCount.textContent = pages;
+      if (pages === 1) {
+        metricPageBadge.textContent = "Single Page";
+        metricPageBadge.className = "inline-block mt-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300";
+      } else {
+        metricPageBadge.textContent = `${pages} Pages`;
+        metricPageBadge.className = "inline-block mt-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300";
+      }
+
+      metricTotalWords.textContent = totalWords.toLocaleString();
+      const avgWords = Math.round(totalWords / Math.max(pages, 1));
+      metricWordDensity.textContent = `~${avgWords} words/page`;
+
+      if (metrics.page_words && metrics.page_words.length) {
+        const breakdown = metrics.page_words.map((w, idx) => `P${idx + 1}: ${w}w`).join(" · ");
+        metricPageWords.textContent = breakdown;
+        if (metricPageWordsLabel) metricPageWordsLabel.textContent = "Distribution";
+      } else {
+        metricPageWords.textContent = `${totalWords}w`;
+        if (metricPageWordsLabel) metricPageWordsLabel.textContent = "Word count";
+      }
+    }
+
+    // Populate Preview Pages
+    if (urls && urls.length) {
+      previewPagesContainer.innerHTML = "";
+      urls.forEach((url, idx) => {
+        const pageWrapper = document.createElement("div");
+        pageWrapper.className = "relative flex flex-col items-center w-full max-w-[800px]";
+
+        const pageHeader = document.createElement("div");
+        pageHeader.className = "w-full flex items-center justify-between pb-1.5 px-1 text-[11px] text-slate-400 font-mono";
+        pageHeader.innerHTML = `<span>${docTitle} &middot; Page ${idx + 1} of ${urls.length}</span><span>${metrics?.page_words?.[idx] || metrics?.total_words || 0} words</span>`;
+
+        const img = document.createElement("img");
+        img.src = `${url}?t=${Date.now()}`;
+        img.alt = `${docTitle} Page ${idx + 1}`;
+        img.className = "resume-page-sheet w-full shadow-lg rounded-sm cursor-pointer hover:shadow-xl transition-shadow";
+        img.title = "Click to enlarge in full screen preview";
+        img.addEventListener("click", () => openFullscreenModal());
+
+        pageWrapper.appendChild(pageHeader);
+        pageWrapper.appendChild(img);
+        previewPagesContainer.appendChild(pageWrapper);
+      });
+
+      previewEmptyState.classList.add("hidden");
+      previewPagesContainer.classList.remove("hidden");
+      previewControls.classList.remove("opacity-40", "pointer-events-none");
+      previewPageIndicator.textContent = `${docTitle}: ${urls.length} page(s) ready`;
+    } else {
+      previewPagesContainer.innerHTML = "";
+      previewPagesContainer.classList.add("hidden");
+      previewEmptyState.classList.remove("hidden");
+      previewControls.classList.add("opacity-40", "pointer-events-none");
+      previewPageIndicator.textContent = `No ${docTitle} rendered`;
+    }
+
+    if (fullscreenPreviewModal && !fullscreenPreviewModal.classList.contains("hidden")) {
+      updateFullscreenModalContent();
+    }
+
+    if (window.lucide) window.lucide.createIcons();
+  };
+
+  if (tabResume) {
+    tabResume.addEventListener("click", (e) => {
+      e.preventDefault();
+      window.switchDocTab("resume");
+    });
+  }
+
+  if (tabCoverLetter) {
+    tabCoverLetter.addEventListener("click", (e) => {
+      e.preventDefault();
+      window.switchDocTab("cover_letter");
+    });
+  }
+
   btnRenderResume.addEventListener("click", triggerRender);
 
   // -------------------------------------------------------------
-  // Zoom Controls
+  // Full Screen Preview Modal Logic
   // -------------------------------------------------------------
-  const applyZoom = () => {
-    previewPagesContainer.style.transform = `scale(${currentZoom / 100})`;
-    zoomLevel.textContent = `${currentZoom}%`;
+  let fullscreenZoom = 100;
+
+  const applyFullscreenZoom = () => {
+    if (fullscreenPagesContainer) {
+      fullscreenPagesContainer.style.transform = `scale(${fullscreenZoom / 100})`;
+    }
+    if (fullscreenZoomLevel) {
+      fullscreenZoomLevel.textContent = `${fullscreenZoom}%`;
+    }
   };
 
-  btnZoomIn.addEventListener("click", () => {
-    if (currentZoom < 180) {
-      currentZoom += 15;
-      applyZoom();
+  const updateFullscreenModalContent = () => {
+    if (!currentRenderData) return;
+
+    const isResume = activeDocTab === "resume";
+    const docTitle = isResume ? "Resume" : "Cover Letter";
+    const urls = isResume ? currentRenderData.preview_urls : currentRenderData.cover_letter_preview_urls;
+    const metrics = isResume ? currentRenderData.metrics : currentRenderData.cover_letter_metrics;
+    const resolvedName = isResume ? currentResolvedFilename : currentResolvedCoverLetterFilename;
+
+    // 1. Title, badge, icon
+    if (fullscreenDocTitle) {
+      fullscreenDocTitle.textContent = `${docTitle} Preview`;
+    }
+    if (fullscreenDocPageBadge) {
+      const pageCount = urls ? urls.length : (metrics?.page_count || 1);
+      fullscreenDocPageBadge.textContent = `${pageCount} ${pageCount === 1 ? "page" : "pages"}`;
+    }
+    if (fullscreenDocIcon) {
+      fullscreenDocIcon.className = isResume
+        ? "p-1.5 rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 flex items-center justify-center flex-shrink-0"
+        : "p-1.5 rounded-lg bg-teal-50 text-teal-600 dark:bg-teal-950/60 dark:text-teal-400 flex items-center justify-center flex-shrink-0";
+      fullscreenDocIcon.innerHTML = `<i data-lucide="${isResume ? 'file-text' : 'mail'}" class="w-4 h-4"></i>`;
+    }
+
+    // 2. Modal PDF Download link
+    if (btnFullscreenDownloadPdf) {
+      btnFullscreenDownloadPdf.href = isResume ? currentRenderData.pdf_preview_url : currentRenderData.cover_letter_pdf_url;
+      btnFullscreenDownloadPdf.download = resolvedName;
+    }
+
+    // 3. Document Toggle Button:
+    // When in Resume: show "Show Cover Letter" button. Disabled if cover letter doesn't exist.
+    // When in Cover Letter: show "Show Resume" button. Disabled if resume doesn't exist.
+    const hasCoverLetter = Boolean(
+      currentRenderData.has_cover_letter &&
+      currentRenderData.cover_letter_preview_urls &&
+      currentRenderData.cover_letter_preview_urls.length > 0
+    );
+    const hasResume = Boolean(
+      currentRenderData.preview_urls &&
+      currentRenderData.preview_urls.length > 0
+    );
+
+    if (btnFullscreenDocToggle) {
+      if (isResume) {
+        if (fullscreenDocToggleLabel) fullscreenDocToggleLabel.textContent = "Show Cover Letter";
+        if (fullscreenDocToggleIcon) {
+          fullscreenDocToggleIcon.setAttribute("data-lucide", "mail");
+          fullscreenDocToggleIcon.className = "w-3.5 h-3.5 text-teal-600 dark:text-teal-400";
+        }
+        if (!hasCoverLetter) {
+          btnFullscreenDocToggle.disabled = true;
+          btnFullscreenDocToggle.title = "No cover letter available in current document";
+          btnFullscreenDocToggle.classList.add("opacity-40", "cursor-not-allowed");
+          btnFullscreenDocToggle.classList.remove("hover:bg-slate-200", "dark:hover:bg-slate-700", "cursor-pointer");
+        } else {
+          btnFullscreenDocToggle.disabled = false;
+          btnFullscreenDocToggle.title = "Switch to Cover Letter preview";
+          btnFullscreenDocToggle.classList.remove("opacity-40", "cursor-not-allowed");
+          btnFullscreenDocToggle.classList.add("hover:bg-slate-200", "dark:hover:bg-slate-700", "cursor-pointer");
+        }
+      } else {
+        if (fullscreenDocToggleLabel) fullscreenDocToggleLabel.textContent = "Show Resume";
+        if (fullscreenDocToggleIcon) {
+          fullscreenDocToggleIcon.setAttribute("data-lucide", "file-text");
+          fullscreenDocToggleIcon.className = "w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400";
+        }
+        if (!hasResume) {
+          btnFullscreenDocToggle.disabled = true;
+          btnFullscreenDocToggle.title = "No resume available in current document";
+          btnFullscreenDocToggle.classList.add("opacity-40", "cursor-not-allowed");
+          btnFullscreenDocToggle.classList.remove("hover:bg-slate-200", "dark:hover:bg-slate-700", "cursor-pointer");
+        } else {
+          btnFullscreenDocToggle.disabled = false;
+          btnFullscreenDocToggle.title = "Switch to Resume preview";
+          btnFullscreenDocToggle.classList.remove("opacity-40", "cursor-not-allowed");
+          btnFullscreenDocToggle.classList.add("hover:bg-slate-200", "dark:hover:bg-slate-700", "cursor-pointer");
+        }
+      }
+    }
+
+    // 4. Render Pages inside Modal
+    if (fullscreenPagesContainer) {
+      fullscreenPagesContainer.innerHTML = "";
+      if (urls && urls.length > 0) {
+        urls.forEach((url, idx) => {
+          const pageWrapper = document.createElement("div");
+          pageWrapper.className = "relative flex flex-col items-center w-full max-w-4xl";
+
+          const pageHeader = document.createElement("div");
+          pageHeader.className = "w-full flex items-center justify-between pb-2 px-1 text-xs text-slate-500 dark:text-slate-400 font-mono";
+          pageHeader.innerHTML = `<span>${docTitle} &middot; Page ${idx + 1} of ${urls.length}</span><span>${metrics?.page_words?.[idx] || metrics?.total_words || 0} words</span>`;
+
+          const img = document.createElement("img");
+          img.src = `${url}?t=${Date.now()}`;
+          img.alt = `${docTitle} Page ${idx + 1}`;
+          img.className = "resume-page-sheet w-full shadow-2xl rounded-sm";
+
+          pageWrapper.appendChild(pageHeader);
+          pageWrapper.appendChild(img);
+          fullscreenPagesContainer.appendChild(pageWrapper);
+        });
+      } else {
+        const emptyMsg = document.createElement("div");
+        emptyMsg.className = "py-16 text-center text-slate-400 text-sm";
+        emptyMsg.textContent = `No ${docTitle} preview available.`;
+        fullscreenPagesContainer.appendChild(emptyMsg);
+      }
+    }
+
+    if (window.lucide) {
+      window.lucide.createIcons();
+    }
+  };
+
+  const openFullscreenModal = () => {
+    if (!currentRenderData) {
+      alert("No document rendered yet. Please click 'Render (CV & Cover Letter)' first.");
+      return;
+    }
+    fullscreenZoom = 100;
+    applyFullscreenZoom();
+    updateFullscreenModalContent();
+    if (fullscreenPreviewModal) {
+      fullscreenPreviewModal.classList.remove("hidden");
+    }
+    if (fullscreenPreviewViewport) {
+      fullscreenPreviewViewport.scrollTop = 0;
+    }
+    document.body.classList.add("overflow-hidden");
+  };
+
+  const closeFullscreenModal = () => {
+    if (fullscreenPreviewModal) {
+      fullscreenPreviewModal.classList.add("hidden");
+    }
+    document.body.classList.remove("overflow-hidden");
+  };
+
+  if (btnFullscreenPreview) {
+    btnFullscreenPreview.addEventListener("click", () => {
+      openFullscreenModal();
+    });
+  }
+
+  if (btnCloseFullscreenModal) {
+    btnCloseFullscreenModal.addEventListener("click", () => {
+      closeFullscreenModal();
+    });
+  }
+
+  if (fullscreenBackdrop) {
+    fullscreenBackdrop.addEventListener("click", () => {
+      closeFullscreenModal();
+    });
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && fullscreenPreviewModal && !fullscreenPreviewModal.classList.contains("hidden")) {
+      closeFullscreenModal();
     }
   });
 
-  btnZoomOut.addEventListener("click", () => {
-    if (currentZoom > 50) {
-      currentZoom -= 15;
-      applyZoom();
-    }
-  });
+  if (btnFullscreenDocToggle) {
+    btnFullscreenDocToggle.addEventListener("click", () => {
+      if (!currentRenderData) return;
+      const targetTab = activeDocTab === "resume" ? "cover_letter" : "resume";
+      if (targetTab === "cover_letter" && (!currentRenderData.has_cover_letter || !currentRenderData.cover_letter_preview_urls?.length)) {
+        return;
+      }
+      if (targetTab === "resume" && !currentRenderData.preview_urls?.length) {
+        return;
+      }
+      window.switchDocTab(targetTab);
+    });
+  }
 
-  btnZoomFit.addEventListener("click", () => {
-    currentZoom = 100;
-    applyZoom();
-  });
+  if (btnFullscreenZoomIn) {
+    btnFullscreenZoomIn.addEventListener("click", () => {
+      if (fullscreenZoom < 220) {
+        fullscreenZoom += 15;
+        applyFullscreenZoom();
+      }
+    });
+  }
+
+  if (btnFullscreenZoomOut) {
+    btnFullscreenZoomOut.addEventListener("click", () => {
+      if (fullscreenZoom > 50) {
+        fullscreenZoom -= 15;
+        applyFullscreenZoom();
+      }
+    });
+  }
+
+  if (btnFullscreenZoomReset) {
+    btnFullscreenZoomReset.addEventListener("click", () => {
+      fullscreenZoom = 100;
+      applyFullscreenZoom();
+    });
+  }
 
   // -------------------------------------------------------------
   // Acceptance & Save Workflow
   // -------------------------------------------------------------
   btnAcceptSave.addEventListener("click", async () => {
     if (!currentToken) {
-      alert("No active rendered resume to save. Please click Render Resume first.");
+      alert("No active document rendered. Please click Render Resume first.");
       return;
     }
 
-    const targetDir = saveDirectoryInput.value.trim();
+    const isResume = activeDocTab === "resume";
     btnAcceptSave.disabled = true;
     btnAcceptSave.innerHTML = '<span class="inline-block animate-spin mr-1">↻</span> Saving...';
+
+    const payload = {
+      token: currentToken,
+      save_resume: isResume,
+      save_cover_letter: !isResume,
+    };
+
+    if (isResume) {
+      payload.custom_filename = currentResolvedFilename;
+      payload.save_directory = saveDirectoryInput.value.trim();
+    } else {
+      payload.custom_cover_letter_filename = currentResolvedCoverLetterFilename;
+      payload.cover_letter_save_directory = coverLetterSaveDirectoryInput ? coverLetterSaveDirectoryInput.value.trim() : "";
+    }
 
     try {
       const res = await fetch("/api/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          token: currentToken,
-          custom_filename: currentResolvedFilename,
-          save_directory: targetDir,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -596,18 +1004,77 @@ document.addEventListener("DOMContentLoaded", () => {
         throw new Error(data.error || data.message || "Failed to save file.");
       }
 
-      // Show success modal
-      modalSavedPath.textContent = data.saved_path;
+      if (isResume) {
+        modalSavedPath.textContent = data.saved_path;
+        if (modalResumeGroup) modalResumeGroup.classList.remove("hidden");
+        if (modalCoverLetterGroup) modalCoverLetterGroup.classList.add("hidden");
+        if (modalTitle) modalTitle.textContent = "Resume Successfully Saved!";
+      } else {
+        if (modalSavedCoverLetterPath) modalSavedCoverLetterPath.textContent = data.saved_cover_letter_path;
+        if (modalResumeGroup) modalResumeGroup.classList.add("hidden");
+        if (modalCoverLetterGroup) modalCoverLetterGroup.classList.remove("hidden");
+        if (modalTitle) modalTitle.textContent = "Cover Letter Successfully Saved!";
+      }
       successModal.classList.remove("hidden");
 
     } catch (err) {
       alert("Save Failed: " + err.message);
     } finally {
       btnAcceptSave.disabled = false;
-      btnAcceptSave.innerHTML = '<i data-lucide="save" class="w-3.5 h-3.5 mr-1.5"></i><span>Accept & Save to Folder</span>';
+      btnAcceptSave.innerHTML = `<i data-lucide="save" class="w-3.5 h-3.5 mr-1.5"></i><span id="lblSaveBtnText">${isResume ? "Save Resume" : "Save Cover Letter"}</span>`;
       if (window.lucide) window.lucide.createIcons();
     }
   });
+
+  // Save Both Workflow
+  if (btnSaveBoth) {
+    btnSaveBoth.addEventListener("click", async () => {
+      if (!currentToken) {
+        alert("No active document rendered. Please click Render Resume first.");
+        return;
+      }
+
+      btnSaveBoth.disabled = true;
+      btnSaveBoth.innerHTML = '<span class="inline-block animate-spin mr-1">↻</span> Saving Both...';
+
+      const payload = {
+        token: currentToken,
+        save_resume: true,
+        save_cover_letter: true,
+        custom_filename: currentResolvedFilename,
+        save_directory: saveDirectoryInput.value.trim(),
+        custom_cover_letter_filename: currentResolvedCoverLetterFilename,
+        cover_letter_save_directory: coverLetterSaveDirectoryInput ? coverLetterSaveDirectoryInput.value.trim() : "",
+      };
+
+      try {
+        const res = await fetch("/api/save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || data.message || "Failed to save files.");
+        }
+
+        modalSavedPath.textContent = data.saved_path;
+        if (modalSavedCoverLetterPath) modalSavedCoverLetterPath.textContent = data.saved_cover_letter_path;
+        if (modalResumeGroup) modalResumeGroup.classList.remove("hidden");
+        if (modalCoverLetterGroup) modalCoverLetterGroup.classList.remove("hidden");
+        if (modalTitle) modalTitle.textContent = "Resume & Cover Letter Saved!";
+        successModal.classList.remove("hidden");
+
+      } catch (err) {
+        alert("Save Both Failed: " + err.message);
+      } finally {
+        btnSaveBoth.disabled = false;
+        btnSaveBoth.innerHTML = '<i data-lucide="folder-archive" class="w-3.5 h-3.5 mr-1.5 text-emerald-400"></i><span>Save Both</span>';
+        if (window.lucide) window.lucide.createIcons();
+      }
+    });
+  }
 
   // Modal actions
   btnCloseModal.addEventListener("click", () => {
@@ -615,7 +1082,14 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   btnCopySavedPath.addEventListener("click", () => {
-    navigator.clipboard.writeText(modalSavedPath.textContent.trim());
+    const paths = [];
+    if (modalResumeGroup && !modalResumeGroup.classList.contains("hidden")) {
+      paths.push(`Resume: ${modalSavedPath.textContent.trim()}`);
+    }
+    if (modalCoverLetterGroup && !modalCoverLetterGroup.classList.contains("hidden")) {
+      paths.push(`Cover Letter: ${modalSavedCoverLetterPath.textContent.trim()}`);
+    }
+    navigator.clipboard.writeText(paths.join("\n"));
     btnCopySavedPath.textContent = "Copied!";
     setTimeout(() => {
       btnCopySavedPath.textContent = "Copy File Path";

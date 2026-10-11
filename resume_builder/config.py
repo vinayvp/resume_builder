@@ -7,11 +7,13 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Default Save Location
+# Default Save Locations
 DEFAULT_SAVE_DIR = "~/Documents/Globathon/Resumes"
+DEFAULT_COVER_LETTER_SAVE_DIR = "~/Documents/Globathon/CoverLetters"
 
-# Default File Naming Template
+# Default File Naming Templates
 DEFAULT_FILENAME_PATTERN = "VinayakPastey_Resume_{role}_{company}.pdf"
+DEFAULT_COVER_LETTER_FILENAME_PATTERN = "VinayakPastey_Cover_Letter_{role}_{company}.pdf"
 
 # Default Design Configuration
 DEFAULT_THEME = "engineeringresumes"

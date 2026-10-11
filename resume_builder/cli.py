@@ -12,9 +12,11 @@ from pathlib import Path
 
 # Ensure local venv site-packages are loaded
 BASE_DIR = Path(__file__).resolve().parent.parent
-venv_site = BASE_DIR / ".venv" / "lib" / f"python{sys.version_info.major}.{sys.version_info.minor}" / "site-packages"
-if venv_site.exists() and str(venv_site) not in sys.path:
-    sys.path.insert(0, str(venv_site))
+venv_lib = BASE_DIR / ".venv" / "lib"
+if venv_lib.exists():
+    for site in venv_lib.glob("python*/site-packages"):
+        if site.exists() and str(site) not in sys.path:
+            sys.path.insert(0, str(site))
 
 import uvicorn
 
