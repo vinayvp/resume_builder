@@ -16,12 +16,19 @@
             mono: ['JetBrains Mono', 'Fira Code', 'Menlo', 'Consolas', 'monospace'],
           },
           colors: {
-            brand: {
-              50: '#f0fdf4',
-              100: '#dcfce7',
-              500: '#22c55e',
-              600: '#16a34a',
-              700: '#15803d',
+            dark: {
+              page: '#0F141A',        // personal_os background hsl(213 27% 8%)
+              panel: '#131920',       // personal_os card/panel hsl(213 27% 10%)
+              surface: '#1A232D',     // personal_os secondary/wells hsl(213 27% 14%)
+              hover: '#1E2834',       // personal_os accent/hover hsl(213 27% 16%)
+              border: '#222D3A',      // personal_os border/input hsl(213 27% 18%)
+              plum: '#222D3A',        // alias for border compatibility
+              deep: '#0F141A',        // personal_os canvas background hsl(213 27% 8%)
+              accent: '#5593F7',      // personal_os primary electric blue hsl(217 91% 65%)
+              accentHover: '#327DF5', // personal_os primary-hover hsl(217 91% 58%)
+              text: '#EDF2F7',        // personal_os foreground hsl(210 40% 95%)
+              muted: '#94A3B8',       // personal_os muted-foreground hsl(215 20% 65%)
+              destructive: '#EF4343', // personal_os destructive hsl(0 84% 60%)
             }
           }
         }
@@ -36,10 +43,10 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="/static/css/style.css?v={{ cache_buster }}">
 </head>
-<body class="min-h-screen lg:h-screen lg:overflow-hidden bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
+<body class="min-h-screen lg:h-screen lg:overflow-hidden bg-slate-50 dark:bg-dark-page text-slate-900 dark:text-[#EDF2F7] flex flex-col font-sans transition-colors duration-200">
 
   <!-- Minimalist Fixed Top Navigation -->
-  <header class="flex-shrink-0 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur sticky top-0 z-30">
+  <header class="flex-shrink-0 border-b border-slate-200/80 dark:border-dark-plum/30 bg-white/80 dark:bg-dark-panel/95 backdrop-blur sticky top-0 z-30">
     <div class="max-w-[1920px] mx-auto px-3 sm:px-5 lg:px-6 h-14 sm:h-15 flex items-center justify-between">
       <div class="flex items-center space-x-3">
         <!-- Light/Dark Mode Logo Badge -->
@@ -49,28 +56,28 @@
         </div>
         <div>
           <div class="flex items-center space-x-2">
-            <h1 class="text-sm sm:text-base font-semibold tracking-tight">Resume Builder</h1>
-            <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] sm:text-[11px] font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
+            <h1 class="text-sm sm:text-base font-semibold tracking-tight dark:text-white">Resume Builder</h1>
+            <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] sm:text-[11px] font-medium bg-blue-50 text-dark-accent dark:bg-dark-accent/15 dark:text-[#5593F7] border border-blue-200 dark:border-dark-accent/40">
               RenderCV CLI
             </span>
           </div>
-          <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">Minimal, modern resume pipeline with preview & analytics</p>
+          <p class="text-[11px] text-slate-500 dark:text-[#94A3B8] hidden sm:block">Minimal, modern resume pipeline with preview & analytics</p>
         </div>
       </div>
 
       <!-- Quick Action Buttons -->
       <div class="flex items-center space-x-2">
-        <button id="btnLoadSample" type="button" class="inline-flex items-center space-x-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-700">
-          <i data-lucide="file-code-2" class="w-3.5 h-3.5"></i>
+        <button id="btnLoadSample" type="button" class="inline-flex items-center space-x-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md bg-slate-100 hover:bg-slate-200 dark:bg-dark-surface dark:hover:bg-[#1E2834] text-slate-700 dark:text-[#EDF2F7] transition-colors border border-slate-200 dark:border-dark-plum/40">
+          <i data-lucide="file-code-2" class="w-3.5 h-3.5 text-dark-accent"></i>
           <span class="hidden sm:inline">Load Sample YAML</span>
           <span class="sm:hidden">Sample</span>
         </button>
-        <button id="btnClearYaml" type="button" class="inline-flex items-center space-x-1 px-2.5 py-1.5 text-xs font-medium rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors">
+        <button id="btnClearYaml" type="button" class="inline-flex items-center space-x-1 px-2.5 py-1.5 text-xs font-medium rounded-md hover:bg-slate-100 dark:hover:bg-dark-surface text-slate-600 dark:text-[#94A3B8] hover:dark:text-white transition-colors">
           <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
           <span>Reset</span>
         </button>
-        <div class="h-4 w-px bg-slate-200 dark:bg-slate-800 mx-0.5"></div>
-        <button id="btnToggleTheme" type="button" class="p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors" title="Toggle Theme">
+        <div class="h-4 w-px bg-slate-200 dark:bg-dark-plum/30 mx-0.5"></div>
+        <button id="btnToggleTheme" type="button" class="p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-dark-surface text-slate-500 hover:text-slate-700 dark:text-[#EDF2F7] dark:hover:text-white transition-colors" title="Toggle Theme">
           <i data-lucide="sun-moon" class="w-4 h-4"></i>
         </button>
       </div>
@@ -89,106 +96,106 @@
     <div class="lg:col-span-3 flex flex-col min-h-0 lg:h-full lg:overflow-y-auto space-y-3.5 pr-0.5">
       
       <!-- Card 1: Application Target -->
-      <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-3.5 sm:p-4 shadow-sm space-y-3 flex-shrink-0">
-        <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+      <div class="bg-white dark:bg-dark-panel rounded-xl border border-slate-200 dark:border-dark-plum/30 p-3.5 sm:p-4 shadow-sm space-y-3 flex-shrink-0">
+        <div class="flex items-center justify-between border-b border-slate-100 dark:border-dark-plum/25 pb-2">
           <div class="flex items-center space-x-2">
-            <i data-lucide="briefcase" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i>
-            <h2 class="text-xs sm:text-sm font-semibold tracking-tight">Application Target</h2>
+            <i data-lucide="briefcase" class="w-4 h-4 text-dark-accent"></i>
+            <h2 class="text-xs sm:text-sm font-semibold tracking-tight dark:text-white">Application Target</h2>
           </div>
-          <span class="text-[10px] text-slate-400 font-medium">Auto-naming</span>
+          <span class="text-[10px] text-slate-400 dark:text-[#94A3B8] font-medium">Auto-naming</span>
         </div>
 
         <div class="space-y-2.5">
           <div>
-            <label for="companyName" class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Company Name</label>
+            <label for="companyName" class="block text-xs font-medium text-slate-700 dark:text-[#EDF2F7] mb-1">Company Name</label>
             <input type="text" id="companyName" placeholder="e.g. Google" value="Globathon"
-              class="w-full text-xs px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all">
+              class="w-full text-xs px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-dark-surface border border-slate-200 dark:border-dark-plum/40 text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-dark-accent focus:border-transparent transition-all">
           </div>
           <div>
-            <label for="roleName" class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Role Name</label>
+            <label for="roleName" class="block text-xs font-medium text-slate-700 dark:text-[#EDF2F7] mb-1">Role Name</label>
             <input type="text" id="roleName" placeholder="e.g. Lead Systems Architect" value="Lead Systems Architect"
-              class="w-full text-xs px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all">
+              class="w-full text-xs px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-dark-surface border border-slate-200 dark:border-dark-plum/40 text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-dark-accent focus:border-transparent transition-all">
           </div>
         </div>
 
         <!-- Resume Target -->
-        <div class="pt-2 border-t border-slate-100 dark:border-slate-800/80 space-y-2">
+        <div class="pt-2 border-t border-slate-100 dark:border-dark-plum/25 space-y-2">
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 flex items-center space-x-1.5">
-              <i data-lucide="file-text" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400"></i>
+            <span class="text-[11px] font-semibold text-slate-700 dark:text-[#EDF2F7] flex items-center space-x-1.5">
+              <i data-lucide="file-text" class="w-3.5 h-3.5 text-dark-accent"></i>
               <span>Resume Target</span>
             </span>
-            <button id="btnEditFilename" type="button" class="text-[11px] text-emerald-600 dark:text-emerald-400 hover:underline font-medium">Edit name</button>
+            <button id="btnEditFilename" type="button" class="text-[11px] text-dark-accent hover:underline font-medium">Edit name</button>
           </div>
           
-          <div class="bg-slate-50 dark:bg-slate-800/50 rounded-lg px-2.5 py-1.5 border border-slate-200/80 dark:border-slate-700/80">
-            <div id="lblFilenamePreview" class="text-[11px] font-mono font-medium text-slate-800 dark:text-slate-200 break-all" title="Click to customize">
+          <div class="bg-slate-50 dark:bg-dark-surface/60 rounded-lg px-2.5 py-1.5 border border-slate-200/80 dark:border-dark-plum/35">
+            <div id="lblFilenamePreview" class="text-[11px] font-mono font-medium text-slate-800 dark:text-[#EDF2F7] break-all" title="Click to customize">
               VinayakPastey_Resume_Lead_Systems_Architect_Globathon.pdf
             </div>
           </div>
 
           <div>
             <div class="flex items-center justify-between mb-1">
-              <label for="saveDirectory" class="block text-[11px] font-medium text-slate-600 dark:text-slate-400">Resume Save Folder</label>
-              <span class="text-[10px] text-slate-400">Auto-created</span>
+              <label for="saveDirectory" class="block text-[11px] font-medium text-slate-600 dark:text-[#94A3B8]">Resume Save Folder</label>
+              <span class="text-[10px] text-slate-400 dark:text-[#94A3B8]">Auto-created</span>
             </div>
             <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400">
+              <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400 dark:text-[#94A3B8]">
                 <i data-lucide="folder" class="w-3.5 h-3.5"></i>
               </div>
               <input type="text" id="saveDirectory" value="{{ default_save_dir }}"
-                class="w-full text-xs pl-8 pr-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent font-mono text-slate-700 dark:text-slate-300">
+                class="w-full text-xs pl-8 pr-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-dark-surface border border-slate-200 dark:border-dark-plum/40 focus:outline-none focus:ring-2 focus:ring-dark-accent focus:border-transparent font-mono text-slate-700 dark:text-[#EDF2F7]">
             </div>
           </div>
         </div>
 
         <!-- Cover Letter Target -->
-        <div class="pt-2 border-t border-slate-100 dark:border-slate-800/80 space-y-2">
+        <div class="pt-2 border-t border-slate-100 dark:border-dark-plum/25 space-y-2">
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 flex items-center space-x-1.5">
-              <i data-lucide="mail" class="w-3.5 h-3.5 text-teal-600 dark:text-teal-400"></i>
+            <span class="text-[11px] font-semibold text-slate-700 dark:text-[#EDF2F7] flex items-center space-x-1.5">
+              <i data-lucide="mail" class="w-3.5 h-3.5 text-dark-accent"></i>
               <span>Cover Letter Target</span>
             </span>
-            <button id="btnEditCoverLetterFilename" type="button" class="text-[11px] text-teal-600 dark:text-teal-400 hover:underline font-medium">Edit name</button>
+            <button id="btnEditCoverLetterFilename" type="button" class="text-[11px] text-dark-accent hover:underline font-medium">Edit name</button>
           </div>
           
-          <div class="bg-slate-50 dark:bg-slate-800/50 rounded-lg px-2.5 py-1.5 border border-slate-200/80 dark:border-slate-700/80">
-            <div id="lblCoverLetterFilenamePreview" class="text-[11px] font-mono font-medium text-teal-800 dark:text-teal-200 break-all" title="Click to customize">
+          <div class="bg-slate-50 dark:bg-dark-surface/60 rounded-lg px-2.5 py-1.5 border border-slate-200/80 dark:border-dark-plum/35">
+            <div id="lblCoverLetterFilenamePreview" class="text-[11px] font-mono font-medium text-slate-800 dark:text-[#EDF2F7] break-all" title="Click to customize">
               VinayakPastey_Cover_Letter_Lead_Systems_Architect_Globathon.pdf
             </div>
           </div>
 
           <div>
             <div class="flex items-center justify-between mb-1">
-              <label for="coverLetterSaveDirectory" class="block text-[11px] font-medium text-slate-600 dark:text-slate-400">Cover Letter Save Folder</label>
-              <span class="text-[10px] text-slate-400">Auto-created</span>
+              <label for="coverLetterSaveDirectory" class="block text-[11px] font-medium text-slate-600 dark:text-[#94A3B8]">Cover Letter Save Folder</label>
+              <span class="text-[10px] text-slate-400 dark:text-[#94A3B8]">Auto-created</span>
             </div>
             <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400">
-                <i data-lucide="folder-check" class="w-3.5 h-3.5 text-teal-600 dark:text-teal-400"></i>
+              <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400 dark:text-[#94A3B8]">
+                <i data-lucide="folder-check" class="w-3.5 h-3.5 text-dark-accent"></i>
               </div>
               <input type="text" id="coverLetterSaveDirectory" value="{{ default_cover_letter_save_dir }}"
-                class="w-full text-xs pl-8 pr-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-mono text-slate-700 dark:text-slate-300">
+                class="w-full text-xs pl-8 pr-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-dark-surface border border-slate-200 dark:border-dark-plum/40 focus:outline-none focus:ring-2 focus:ring-dark-accent focus:border-transparent font-mono text-slate-700 dark:text-[#EDF2F7]">
             </div>
           </div>
         </div>
       </div>
 
       <!-- Card 2: Below Design Settings -->
-      <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-3.5 sm:p-4 shadow-sm space-y-3 flex-shrink-0">
-        <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+      <div class="bg-white dark:bg-dark-panel rounded-xl border border-slate-200 dark:border-dark-plum/30 p-3.5 sm:p-4 shadow-sm space-y-3 flex-shrink-0">
+        <div class="flex items-center justify-between border-b border-slate-100 dark:border-dark-plum/25 pb-2">
           <div class="flex items-center space-x-2">
-            <i data-lucide="palette" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i>
-            <h2 class="text-xs sm:text-sm font-semibold tracking-tight">Design Settings</h2>
+            <i data-lucide="palette" class="w-4 h-4 text-dark-accent"></i>
+            <h2 class="text-xs sm:text-sm font-semibold tracking-tight dark:text-white">Design Settings</h2>
           </div>
-          <span class="text-[10px] bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-500">RenderCV</span>
+          <span class="text-[10px] bg-slate-100 dark:bg-dark-surface px-1.5 py-0.5 rounded text-slate-500 dark:text-[#94A3B8] border border-transparent dark:border-dark-plum/30">RenderCV</span>
         </div>
 
         <div class="space-y-2.5">
           <!-- Theme -->
           <div>
-            <label for="selTheme" class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Theme</label>
-            <select id="selTheme" class="w-full text-xs px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            <label for="selTheme" class="block text-xs font-medium text-slate-700 dark:text-[#EDF2F7] mb-1">Theme</label>
+            <select id="selTheme" class="w-full text-xs px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-dark-surface border border-slate-200 dark:border-dark-plum/40 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-dark-accent">
               {% for t in available_themes %}
                 <option value="{{ t.id }}" {% if t.id == default_theme %}selected{% endif %}>{{ t.name }}</option>
               {% endfor %}
@@ -197,25 +204,25 @@
 
           <!-- Font Family (Default Calibri) -->
           <div>
-            <label for="selFont" class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-              Font Family <span class="text-emerald-600 dark:text-emerald-400 font-semibold">(Default: Calibri)</span>
+            <label for="selFont" class="block text-xs font-medium text-slate-700 dark:text-[#EDF2F7] mb-1">
+              Font Family <span class="text-dark-accent font-semibold">(Default: Calibri)</span>
             </label>
             <div class="flex space-x-1.5">
-              <select id="selFont" class="flex-1 text-xs px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+              <select id="selFont" class="flex-1 text-xs px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-dark-surface border border-slate-200 dark:border-dark-plum/40 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-dark-accent">
                 {% for f in available_fonts %}
                   <option value="{{ f }}" {% if f == default_font %}selected{% endif %}>{{ f }}</option>
                 {% endfor %}
                 <option value="__custom__">+ Custom Font...</option>
               </select>
               <input type="text" id="customFontInput" placeholder="Custom font" style="display:none;"
-                class="w-24 text-xs px-2 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                class="w-24 text-xs px-2 py-1.5 rounded-lg bg-slate-50 dark:bg-dark-surface border border-slate-200 dark:border-dark-plum/40 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-dark-accent">
             </div>
           </div>
 
           <!-- Page Size (Default A4) -->
           <div>
-            <label for="selPageSize" class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Page Size</label>
-            <select id="selPageSize" class="w-full text-xs px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            <label for="selPageSize" class="block text-xs font-medium text-slate-700 dark:text-[#EDF2F7] mb-1">Page Size</label>
+            <select id="selPageSize" class="w-full text-xs px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-dark-surface border border-slate-200 dark:border-dark-plum/40 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-dark-accent">
               {% for p in available_page_sizes %}
                 <option value="{{ p.id }}" {% if p.id == default_page_size %}selected{% endif %}>{{ p.name }}</option>
               {% endfor %}
@@ -224,8 +231,8 @@
 
           <!-- Phone Number Format (Default International) -->
           <div>
-            <label for="selPhoneFormat" class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Phone Format</label>
-            <select id="selPhoneFormat" class="w-full text-xs px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            <label for="selPhoneFormat" class="block text-xs font-medium text-slate-700 dark:text-[#EDF2F7] mb-1">Phone Format</label>
+            <select id="selPhoneFormat" class="w-full text-xs px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-dark-surface border border-slate-200 dark:border-dark-plum/40 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-dark-accent">
               {% for ph in available_phone_formats %}
                 <option value="{{ ph.id }}" {% if ph.id == default_phone_format %}selected{% endif %}>{{ ph.name }}</option>
               {% endfor %}
@@ -233,31 +240,31 @@
           </div>
 
           <!-- Toggles: No footer note, Entry page break & Section page break -->
-          <div class="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
+          <div class="pt-2 border-t border-slate-100 dark:border-dark-plum/25 space-y-2">
             <label class="relative flex items-center cursor-pointer select-none">
               <input type="checkbox" id="chkNoFooterNote" class="sr-only peer" checked>
-              <div class="w-8 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-emerald-600"></div>
+              <div class="w-8 h-4 bg-slate-300 dark:bg-dark-surface border dark:border-dark-plum/40 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-dark-accent"></div>
               <div class="ml-2.5">
-                <span class="text-xs font-medium text-slate-700 dark:text-slate-300 block">No footer or top note</span>
-                <span class="text-[10px] text-slate-400 block">Hides page numbers & last updated date</span>
+                <span class="text-xs font-medium text-slate-700 dark:text-[#EDF2F7] block">No footer or top note</span>
+                <span class="text-[10px] text-slate-400 dark:text-[#94A3B8] block">Hides page numbers & last updated date</span>
               </div>
             </label>
 
             <label class="relative flex items-center cursor-pointer select-none">
               <input type="checkbox" id="chkAllowPageBreak" class="sr-only peer" {% if default_allow_page_break_in_entries %}checked{% endif %}>
-              <div class="w-8 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-emerald-600"></div>
+              <div class="w-8 h-4 bg-slate-300 dark:bg-dark-surface border dark:border-dark-plum/40 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-dark-accent"></div>
               <div class="ml-2.5">
-                <span class="text-xs font-medium text-slate-700 dark:text-slate-300 block">Allow page break in entries</span>
-                <span class="text-[10px] text-slate-400 block">Splits a single entry across pages</span>
+                <span class="text-xs font-medium text-slate-700 dark:text-[#EDF2F7] block">Allow page break in entries</span>
+                <span class="text-[10px] text-slate-400 dark:text-[#94A3B8] block">Splits a single entry across pages</span>
               </div>
             </label>
 
             <label class="relative flex items-center cursor-pointer select-none">
               <input type="checkbox" id="chkAllowSectionPageBreak" class="sr-only peer" {% if default_allow_page_break_in_sections %}checked{% endif %}>
-              <div class="w-8 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-emerald-600"></div>
+              <div class="w-8 h-4 bg-slate-300 dark:bg-dark-surface border dark:border-dark-plum/40 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-dark-accent"></div>
               <div class="ml-2.5">
-                <span class="text-xs font-medium text-slate-700 dark:text-slate-300 block">Allow page break in sections</span>
-                <span class="text-[10px] text-slate-400 block">Splits section entries across pages</span>
+                <span class="text-xs font-medium text-slate-700 dark:text-[#EDF2F7] block">Allow page break in sections</span>
+                <span class="text-[10px] text-slate-400 dark:text-[#94A3B8] block">Splits section entries across pages</span>
               </div>
             </label>
           </div>
@@ -273,34 +280,34 @@
     <div class="lg:col-span-4 flex flex-col min-h-0 lg:h-full">
       
       <!-- Card: YAML Config Editor Container -->
-      <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-3.5 sm:p-4 shadow-sm h-full flex flex-col min-h-0 space-y-2.5">
+      <div class="bg-white dark:bg-dark-panel rounded-xl border border-slate-200 dark:border-dark-plum/30 p-3.5 sm:p-4 shadow-sm h-full flex flex-col min-h-0 space-y-2.5">
         
         <!-- Header -->
-        <div class="flex-shrink-0 flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+        <div class="flex-shrink-0 flex items-center justify-between border-b border-slate-100 dark:border-dark-plum/25 pb-2">
           <div class="flex items-center space-x-2">
-            <i data-lucide="code" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i>
-            <h2 class="text-xs sm:text-sm font-semibold tracking-tight">YAML Config Editor</h2>
+            <i data-lucide="code" class="w-4 h-4 text-dark-accent"></i>
+            <h2 class="text-xs sm:text-sm font-semibold tracking-tight dark:text-white">YAML Config Editor</h2>
           </div>
           <div class="flex items-center space-x-2">
             <!-- Upload YAML Button -->
-            <label for="fileUploadInput" class="cursor-pointer inline-flex items-center space-x-1 px-2.5 py-1 rounded text-xs font-medium bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors">
-              <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
+            <label for="fileUploadInput" class="cursor-pointer inline-flex items-center space-x-1 px-2.5 py-1 rounded text-xs font-medium bg-slate-100 hover:bg-slate-200 dark:bg-dark-surface dark:hover:bg-[#1E2834] text-slate-700 dark:text-[#EDF2F7] border border-slate-200 dark:border-dark-plum/40 transition-colors">
+              <i data-lucide="upload-cloud" class="w-3.5 h-3.5 text-dark-accent"></i>
               <span>Upload</span>
             </label>
             <input type="file" id="fileUploadInput" accept=".yaml,.yml" class="hidden">
-            <span id="yamlLineCount" class="text-[11px] text-slate-400 font-mono">0 lines</span>
+            <span id="yamlLineCount" class="text-[11px] text-slate-400 dark:text-[#94A3B8] font-mono">0 lines</span>
           </div>
         </div>
 
         <!-- Drag & Drop / YAML Editor Textarea (Expands to fill vertical space & scrolls internally) -->
         <div id="dropZone" class="relative flex-1 min-h-0 flex flex-col">
           <textarea id="yamlEditor" spellcheck="false" placeholder="# Paste your RenderCV YAML here or click 'Load Sample YAML'..."
-            class="w-full flex-1 min-h-0 h-full p-3 text-xs font-mono rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none leading-relaxed transition-all overflow-y-auto"></textarea>
+            class="w-full flex-1 min-h-0 h-full p-3 text-xs font-mono rounded-lg bg-slate-50 dark:bg-dark-deep border border-slate-200 dark:border-dark-plum/30 text-slate-800 dark:text-[#EDF2F7] focus:outline-none focus:ring-2 focus:ring-dark-accent focus:border-transparent resize-none leading-relaxed transition-all overflow-y-auto"></textarea>
           
-          <div id="dropOverlay" class="absolute inset-0 bg-emerald-500/10 border-2 border-dashed border-emerald-500 rounded-lg flex items-center justify-center backdrop-blur-[1px] pointer-events-none hidden">
+          <div id="dropOverlay" class="absolute inset-0 bg-dark-accent/10 border-2 border-dashed border-dark-accent rounded-lg flex items-center justify-center backdrop-blur-[1px] pointer-events-none hidden">
             <div class="text-center">
-              <i data-lucide="file-up" class="w-8 h-8 text-emerald-600 mx-auto mb-1 animate-bounce"></i>
-              <p class="text-xs font-semibold text-emerald-700 dark:text-emerald-300">Drop YAML file to load</p>
+              <i data-lucide="file-up" class="w-8 h-8 text-dark-accent mx-auto mb-1 animate-bounce"></i>
+              <p class="text-xs font-semibold text-dark-accent dark:text-[#5593F7]">Drop YAML file to load</p>
             </div>
           </div>
         </div>
@@ -308,64 +315,64 @@
         <!-- Below Render Button -->
         <div class="flex-shrink-0">
           <button id="btnRenderResume" type="button"
-            class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-black dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-semibold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center space-x-2 group">
+            class="w-full py-2.5 px-4 rounded-xl bg-dark-accent hover:bg-dark-accentHover text-white font-semibold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center space-x-2 group">
             <i data-lucide="play" class="w-3.5 h-3.5 fill-current group-hover:scale-110 transition-transform"></i>
             <span id="lblRenderBtnText">Render (CV & Cover Letter)</span>
-            <span class="text-[11px] text-slate-400 dark:text-emerald-200 font-normal ml-1">(Ctrl+Enter)</span>
+            <span class="text-[11px] text-blue-200 font-normal ml-1">(Ctrl+Enter)</span>
           </button>
         </div>
 
         <!-- Below That: Steps Loading in JUST ONE LINE -->
-        <div class="flex-shrink-0 p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/80 dark:border-slate-800 space-y-1.5">
+        <div class="flex-shrink-0 p-2.5 bg-slate-50 dark:bg-dark-surface/60 rounded-xl border border-slate-200/80 dark:border-dark-plum/30 space-y-1.5">
           
           <!-- Horizontal 1-Line Stepper Nodes -->
           <div class="flex items-center justify-between gap-1 w-full overflow-x-auto select-none pt-0.5">
             <!-- Step 1: Validate -->
-            <div id="step-validate_input" class="step-pill flex items-center space-x-1.5 px-2 py-1 rounded-md bg-slate-200/70 dark:bg-slate-800 text-slate-500 text-[11px] font-medium transition-all" title="Validate YAML Specification">
-              <span class="step-icon w-4 h-4 rounded-full bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center text-[10px]">1</span>
+            <div id="step-validate_input" class="step-pill flex items-center space-x-1.5 px-2 py-1 rounded-md bg-slate-200/70 dark:bg-dark-panel text-slate-500 dark:text-[#94A3B8] text-[11px] font-medium transition-all" title="Validate YAML Specification">
+              <span class="step-icon w-4 h-4 rounded-full bg-slate-300 dark:bg-dark-surface text-slate-600 dark:text-[#EDF2F7] flex items-center justify-center text-[10px]">1</span>
               <span class="step-label hidden sm:inline truncate">Validate</span>
             </div>
-            <div id="step-line-1" class="flex-1 h-0.5 min-w-[6px] bg-slate-200 dark:bg-slate-700 transition-colors"></div>
+            <div id="step-line-1" class="flex-1 h-0.5 min-w-[6px] bg-slate-200 dark:bg-dark-plum/30 transition-colors"></div>
 
             <!-- Step 2: Design -->
-            <div id="step-apply_design" class="step-pill flex items-center space-x-1.5 px-2 py-1 rounded-md bg-slate-200/70 dark:bg-slate-800 text-slate-500 text-[11px] font-medium transition-all" title="Apply Design & Typography">
-              <span class="step-icon w-4 h-4 rounded-full bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center text-[10px]">2</span>
+            <div id="step-apply_design" class="step-pill flex items-center space-x-1.5 px-2 py-1 rounded-md bg-slate-200/70 dark:bg-dark-panel text-slate-500 dark:text-[#94A3B8] text-[11px] font-medium transition-all" title="Apply Design & Typography">
+              <span class="step-icon w-4 h-4 rounded-full bg-slate-300 dark:bg-dark-surface text-slate-600 dark:text-[#EDF2F7] flex items-center justify-center text-[10px]">2</span>
               <span class="step-label hidden sm:inline truncate">Design</span>
             </div>
-            <div id="step-line-2" class="flex-1 h-0.5 min-w-[6px] bg-slate-200 dark:bg-slate-700 transition-colors"></div>
+            <div id="step-line-2" class="flex-1 h-0.5 min-w-[6px] bg-slate-200 dark:bg-dark-plum/30 transition-colors"></div>
 
             <!-- Step 3: RenderCV -->
-            <div id="step-execute_cli" class="step-pill flex items-center space-x-1.5 px-2 py-1 rounded-md bg-slate-200/70 dark:bg-slate-800 text-slate-500 text-[11px] font-medium transition-all" title="Execute RenderCV CLI Engine">
-              <span class="step-icon w-4 h-4 rounded-full bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center text-[10px]">3</span>
+            <div id="step-execute_cli" class="step-pill flex items-center space-x-1.5 px-2 py-1 rounded-md bg-slate-200/70 dark:bg-dark-panel text-slate-500 dark:text-[#94A3B8] text-[11px] font-medium transition-all" title="Execute RenderCV CLI Engine">
+              <span class="step-icon w-4 h-4 rounded-full bg-slate-300 dark:bg-dark-surface text-slate-600 dark:text-[#EDF2F7] flex items-center justify-center text-[10px]">3</span>
               <span class="step-label hidden sm:inline truncate">RenderCV</span>
             </div>
-            <div id="step-line-3" class="flex-1 h-0.5 min-w-[6px] bg-slate-200 dark:bg-slate-700 transition-colors"></div>
+            <div id="step-line-3" class="flex-1 h-0.5 min-w-[6px] bg-slate-200 dark:bg-dark-plum/30 transition-colors"></div>
 
             <!-- Step 4: Metrics -->
-            <div id="step-analyze_metrics" class="step-pill flex items-center space-x-1.5 px-2 py-1 rounded-md bg-slate-200/70 dark:bg-slate-800 text-slate-500 text-[11px] font-medium transition-all" title="Analyze Document Metrics">
-              <span class="step-icon w-4 h-4 rounded-full bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center text-[10px]">4</span>
+            <div id="step-analyze_metrics" class="step-pill flex items-center space-x-1.5 px-2 py-1 rounded-md bg-slate-200/70 dark:bg-dark-panel text-slate-500 dark:text-[#94A3B8] text-[11px] font-medium transition-all" title="Analyze Document Metrics">
+              <span class="step-icon w-4 h-4 rounded-full bg-slate-300 dark:bg-dark-surface text-slate-600 dark:text-[#EDF2F7] flex items-center justify-center text-[10px]">4</span>
               <span class="step-label hidden sm:inline truncate">Metrics</span>
             </div>
-            <div id="step-line-4" class="flex-1 h-0.5 min-w-[6px] bg-slate-200 dark:bg-slate-700 transition-colors"></div>
+            <div id="step-line-4" class="flex-1 h-0.5 min-w-[6px] bg-slate-200 dark:bg-dark-plum/30 transition-colors"></div>
 
             <!-- Step 5: Preview -->
-            <div id="step-prepare_preview" class="step-pill flex items-center space-x-1.5 px-2 py-1 rounded-md bg-slate-200/70 dark:bg-slate-800 text-slate-500 text-[11px] font-medium transition-all" title="Generate Visual Preview">
-              <span class="step-icon w-4 h-4 rounded-full bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center text-[10px]">5</span>
+            <div id="step-prepare_preview" class="step-pill flex items-center space-x-1.5 px-2 py-1 rounded-md bg-slate-200/70 dark:bg-dark-panel text-slate-500 dark:text-[#94A3B8] text-[11px] font-medium transition-all" title="Generate Visual Preview">
+              <span class="step-icon w-4 h-4 rounded-full bg-slate-300 dark:bg-dark-surface text-slate-600 dark:text-[#EDF2F7] flex items-center justify-center text-[10px]">5</span>
               <span class="step-label hidden sm:inline truncate">Preview</span>
             </div>
           </div>
 
           <!-- Single-Line Dynamic Status Ticker + CLI Logs Link -->
-          <div class="flex items-center justify-between text-[11px] pt-1 border-t border-slate-200/60 dark:border-slate-800/80">
+          <div class="flex items-center justify-between text-[11px] pt-1 border-t border-slate-200/60 dark:border-dark-plum/25">
             <div class="flex items-center space-x-1.5 min-w-0 flex-1">
-              <span id="stepTickerDot" class="w-2 h-2 rounded-full bg-slate-400 flex-shrink-0"></span>
-              <span id="stepTickerText" class="truncate font-mono text-slate-600 dark:text-slate-400">Ready to render</span>
+              <span id="stepTickerDot" class="w-2 h-2 rounded-full bg-slate-400 dark:bg-dark-plum flex-shrink-0"></span>
+              <span id="stepTickerText" class="truncate font-mono text-slate-600 dark:text-[#EDF2F7]">Ready to render</span>
             </div>
             <div class="flex items-center space-x-2 flex-shrink-0 ml-2">
-              <span id="pipelineStatusBadge" class="inline-flex items-center px-1.5 py-0.2 text-[10px] font-medium rounded-full bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+              <span id="pipelineStatusBadge" class="inline-flex items-center px-1.5 py-0.2 text-[10px] font-medium rounded-full bg-slate-100 text-slate-600 dark:bg-dark-surface dark:text-[#94A3B8] border border-transparent dark:border-dark-plum/30">
                 Idle
               </span>
-              <button id="btnToggleCliLogs" type="button" class="text-[10px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 flex items-center space-x-1">
+              <button id="btnToggleCliLogs" type="button" class="text-[10px] text-slate-400 hover:text-slate-700 dark:text-[#94A3B8] dark:hover:text-white flex items-center space-x-1">
                 <i data-lucide="terminal" class="w-3 h-3"></i>
                 <span>Logs</span>
               </button>
@@ -373,12 +380,12 @@
           </div>
 
           <!-- Collapsible CLI Logs Output -->
-          <div id="cliLogsPanel" class="hidden pt-2 border-t border-slate-200 dark:border-slate-800">
+          <div id="cliLogsPanel" class="hidden pt-2 border-t border-slate-200 dark:border-dark-plum/25">
             <div class="flex items-center justify-between mb-1">
-              <span class="text-[10px] font-mono text-slate-500">RenderCV Output</span>
-              <button id="btnCopyLogs" type="button" class="text-[10px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">Copy</button>
+              <span class="text-[10px] font-mono text-slate-500 dark:text-[#94A3B8]">RenderCV Output</span>
+              <button id="btnCopyLogs" type="button" class="text-[10px] text-slate-400 hover:text-slate-600 dark:text-[#94A3B8] dark:hover:text-white">Copy</button>
             </div>
-            <pre id="cliLogsContent" class="text-[10px] font-mono p-2 rounded-lg bg-slate-950 text-slate-300 max-h-28 overflow-y-auto whitespace-pre-wrap leading-relaxed select-all">No CLI logs yet.</pre>
+            <pre id="cliLogsContent" class="text-[10px] font-mono p-2 rounded-lg bg-slate-950 dark:bg-dark-deep text-slate-300 dark:text-[#EDF2F7] border border-transparent dark:border-dark-plum/30 max-h-28 overflow-y-auto whitespace-pre-wrap leading-relaxed select-all">No CLI logs yet.</pre>
           </div>
 
         </div>
@@ -394,36 +401,36 @@
     <div class="lg:col-span-5 flex flex-col min-h-0 lg:h-full">
       
       <!-- Preview & Analytics Card -->
-      <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-3.5 sm:p-4 shadow-sm h-full flex flex-col min-h-0 space-y-2.5">
+      <div class="bg-white dark:bg-dark-panel rounded-xl border border-slate-200 dark:border-dark-plum/30 p-3.5 sm:p-4 shadow-sm h-full flex flex-col min-h-0 space-y-2.5">
         
         <!-- Preview Pane Top Header with Controls & Document Switcher Tabs -->
-        <div class="flex-shrink-0 flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2 gap-2 flex-wrap sm:flex-nowrap">
+        <div class="flex-shrink-0 flex items-center justify-between border-b border-slate-100 dark:border-dark-plum/30 pb-2 gap-2 flex-wrap sm:flex-nowrap">
           <div class="flex items-center space-x-2.5 min-w-0">
             <div class="flex items-center space-x-1.5 flex-shrink-0">
-              <i data-lucide="eye" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i>
-              <h2 class="text-xs sm:text-sm font-semibold tracking-tight">Interactive Preview</h2>
+              <i data-lucide="eye" class="w-4 h-4 text-blue-600 dark:text-dark-accent"></i>
+              <h2 class="text-xs sm:text-sm font-semibold tracking-tight text-slate-900 dark:text-white">Interactive Preview</h2>
             </div>
 
             <!-- Tab System Right Beside the Text -->
-            <div id="docTabSelector" class="inline-flex items-center p-0.5 rounded-lg bg-slate-100 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 select-none flex-shrink-0">
-              <button id="tabResume" type="button" onclick="window.switchDocTab && window.switchDocTab('resume')" class="cursor-pointer inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm border border-slate-200/60 dark:border-slate-700/60 transition-all">
-                <i data-lucide="file-text" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 pointer-events-none"></i>
+            <div id="docTabSelector" class="inline-flex items-center p-0.5 rounded-lg bg-slate-100 dark:bg-dark-deep border border-slate-200/80 dark:border-dark-plum/30 select-none flex-shrink-0">
+              <button id="tabResume" type="button" onclick="window.switchDocTab && window.switchDocTab('resume')" class="cursor-pointer inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-white dark:bg-dark-surface text-slate-900 dark:text-white shadow-sm border border-slate-200/60 dark:border-dark-plum/40 transition-all">
+                <i data-lucide="file-text" class="w-3.5 h-3.5 text-blue-600 dark:text-dark-accent pointer-events-none"></i>
                 <span class="pointer-events-none">Resume</span>
-                <span id="tabResumeBadge" class="pointer-events-none text-[9px] px-1.5 py-0.2 rounded-full bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300 font-medium">Ready</span>
+                <span id="tabResumeBadge" class="pointer-events-none text-[9px] px-1.5 py-0.2 rounded-full bg-slate-200 text-slate-600 dark:bg-dark-panel dark:text-[#EDF2F7] font-medium">Ready</span>
               </button>
-              <button id="tabCoverLetter" type="button" onclick="window.switchDocTab && window.switchDocTab('cover_letter')" class="cursor-pointer inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-md text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">
-                <i data-lucide="mail" class="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 pointer-events-none"></i>
+              <button id="tabCoverLetter" type="button" onclick="window.switchDocTab && window.switchDocTab('cover_letter')" class="cursor-pointer inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-md text-xs font-medium text-slate-500 dark:text-[#94A3B8] hover:text-slate-900 dark:hover:text-white transition-all">
+                <i data-lucide="mail" class="w-3.5 h-3.5 text-blue-600 dark:text-dark-accent pointer-events-none"></i>
                 <span class="pointer-events-none">Cover Letter</span>
-                <span id="tabCoverLetterBadge" class="pointer-events-none text-[9px] px-1.5 py-0.2 rounded-full bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300 font-medium">Ready</span>
+                <span id="tabCoverLetterBadge" class="pointer-events-none text-[9px] px-1.5 py-0.2 rounded-full bg-slate-200 text-slate-600 dark:bg-dark-panel dark:text-[#EDF2F7] font-medium">Ready</span>
               </button>
             </div>
 
-            <span id="previewPageIndicator" class="text-xs text-slate-400 hidden xl:inline truncate"></span>
+            <span id="previewPageIndicator" class="text-xs text-slate-400 dark:text-[#94A3B8] hidden xl:inline truncate"></span>
           </div>
 
           <!-- Preview Actions (Full Screen Preview) -->
           <div id="previewControls" class="flex items-center opacity-40 pointer-events-none transition-opacity flex-shrink-0">
-            <button id="btnFullscreenPreview" type="button" class="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 text-xs font-medium border border-slate-200/60 dark:border-slate-800/80 shadow-xs transition-colors" title="Full Screen Preview">
+            <button id="btnFullscreenPreview" type="button" class="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-lg hover:bg-slate-100 dark:hover:bg-dark-surface text-slate-600 dark:text-[#EDF2F7] hover:text-blue-600 dark:hover:text-dark-accent text-xs font-medium border border-slate-200/60 dark:border-dark-plum/30 shadow-xs transition-colors" title="Full Screen Preview">
               <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
               <span class="hidden sm:inline">Full Screen</span>
             </button>
@@ -435,65 +442,65 @@
           <!-- Metrics Row -->
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <!-- Pages -->
-            <div class="p-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 text-center">
-              <span class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold block">Pages</span>
+            <div class="p-2 rounded-lg bg-slate-50 dark:bg-dark-surface/60 border border-slate-100 dark:border-dark-plum/30 text-center">
+              <span class="text-[10px] text-slate-400 dark:text-[#94A3B8] uppercase tracking-wider font-semibold block">Pages</span>
               <span id="metricPageCount" class="text-lg font-bold text-slate-900 dark:text-white block mt-0.5">0</span>
-              <span id="metricPageBadge" class="inline-block mt-0.5 text-[9px] font-medium px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">Single</span>
+              <span id="metricPageBadge" class="inline-block mt-0.5 text-[9px] font-medium px-1.5 py-0.2 rounded-full bg-blue-100 text-blue-800 dark:bg-dark-accent/20 dark:text-blue-300">Single</span>
             </div>
 
             <!-- Words Used -->
-            <div class="p-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 text-center">
-              <span class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold block">Words</span>
+            <div class="p-2 rounded-lg bg-slate-50 dark:bg-dark-surface/60 border border-slate-100 dark:border-dark-plum/30 text-center">
+              <span class="text-[10px] text-slate-400 dark:text-[#94A3B8] uppercase tracking-wider font-semibold block">Words</span>
               <span id="metricTotalWords" class="text-lg font-bold text-slate-900 dark:text-white block mt-0.5">0</span>
-              <span id="metricWordDensity" class="text-[9px] text-slate-500 block mt-0.5">~0 w/p</span>
+              <span id="metricWordDensity" class="text-[9px] text-slate-500 dark:text-[#94A3B8] block mt-0.5">~0 w/p</span>
             </div>
 
             <!-- Per-Page Breakdown -->
-            <div class="p-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 text-center">
-              <span class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold block">Per Page</span>
+            <div class="p-2 rounded-lg bg-slate-50 dark:bg-dark-surface/60 border border-slate-100 dark:border-dark-plum/30 text-center">
+              <span class="text-[10px] text-slate-400 dark:text-[#94A3B8] uppercase tracking-wider font-semibold block">Per Page</span>
               <span id="metricPageWords" class="text-xs font-bold text-slate-900 dark:text-white block mt-0.5 font-mono truncate">--</span>
-              <span id="metricPageWordsLabel" class="text-[9px] text-slate-400 block mt-0.5">Distribution</span>
+              <span id="metricPageWordsLabel" class="text-[9px] text-slate-400 dark:text-[#94A3B8] block mt-0.5">Distribution</span>
             </div>
 
             <!-- Render Time -->
-            <div class="p-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 text-center">
-              <span class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold block">Time</span>
-              <span id="metricRenderTime" class="text-lg font-bold text-emerald-600 dark:text-emerald-400 block mt-0.5">0 ms</span>
-              <span class="text-[9px] text-slate-400 block mt-0.5">RenderCV</span>
+            <div class="p-2 rounded-lg bg-slate-50 dark:bg-dark-surface/60 border border-slate-100 dark:border-dark-plum/30 text-center">
+              <span class="text-[10px] text-slate-400 dark:text-[#94A3B8] uppercase tracking-wider font-semibold block">Time</span>
+              <span id="metricRenderTime" class="text-lg font-bold text-blue-600 dark:text-dark-accent block mt-0.5">0 ms</span>
+              <span class="text-[9px] text-slate-400 dark:text-[#94A3B8] block mt-0.5">RenderCV</span>
             </div>
           </div>
 
           <!-- Acceptance Action Strip -->
-          <div class="p-2.5 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/40 dark:to-slate-900 border border-emerald-200 dark:border-emerald-800/60 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <div class="p-2.5 rounded-xl bg-slate-100 dark:bg-dark-surface border border-slate-200/80 dark:border-dark-plum/40 flex flex-col sm:flex-row items-center justify-between gap-2">
             <div class="min-w-0">
               <div class="flex items-center space-x-1.5">
-                <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 flex-shrink-0"></i>
-                <span id="lblReviewTitle" class="text-xs font-semibold text-emerald-950 dark:text-emerald-200 truncate">Ready for Review</span>
+                <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-blue-600 dark:text-dark-accent flex-shrink-0"></i>
+                <span id="lblReviewTitle" class="text-xs font-semibold text-slate-900 dark:text-white truncate">Ready for Review</span>
               </div>
-              <p class="text-[10px] text-emerald-800/80 dark:text-emerald-400/80 truncate mt-0.5">
-                Target: <span id="lblTargetLocation" class="font-mono font-medium">~/Documents/Globathon/Resumes</span>
+              <p class="text-[10px] text-slate-500 dark:text-[#94A3B8] truncate mt-0.5">
+                Target: <span id="lblTargetLocation" class="font-mono font-medium text-slate-700 dark:text-[#EDF2F7]">~/Documents/Globathon/Resumes</span>
               </p>
             </div>
 
             <div class="flex items-center space-x-2 w-full sm:w-auto flex-shrink-0">
               <!-- Download Active PDF -->
               <a id="btnDownloadPdf" href="#" target="_blank" download
-                class="flex-1 sm:flex-none inline-flex items-center justify-center space-x-1 px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-xs font-medium text-slate-700 dark:text-slate-200 shadow-sm transition-colors" title="Download active PDF">
+                class="flex-1 sm:flex-none inline-flex items-center justify-center space-x-1 px-2.5 py-1.5 rounded-lg bg-white dark:bg-dark-panel border border-slate-200 dark:border-dark-plum/40 hover:bg-slate-50 dark:hover:bg-dark-surface text-xs font-medium text-slate-700 dark:text-[#EDF2F7] shadow-sm transition-colors" title="Download active PDF">
                 <i data-lucide="download" class="w-3.5 h-3.5"></i>
                 <span id="lblDownloadBtn">Download</span>
               </a>
 
               <!-- Accept & Save Active Document (Resume or Cover Letter) -->
               <button id="btnAcceptSave" type="button"
-                class="flex-1 sm:flex-none inline-flex items-center justify-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-md hover:shadow-lg transition-all" title="Save current document">
+                class="flex-1 sm:flex-none inline-flex items-center justify-center space-x-1.5 px-3 py-1.5 rounded-lg bg-dark-accent hover:bg-dark-accentHover text-white text-xs font-semibold shadow-md transition-all" title="Save current document">
                 <i data-lucide="save" class="w-3.5 h-3.5"></i>
                 <span id="lblSaveBtnText">Save Resume</span>
               </button>
 
               <!-- Save Both Button (Visible when cover letter exists) -->
               <button id="btnSaveBoth" type="button"
-                class="hidden flex-1 sm:flex-none inline-flex items-center justify-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white text-xs font-semibold shadow-sm hover:shadow transition-all" title="Save both Resume and Cover Letter to their respective folders">
-                <i data-lucide="folder-archive" class="w-3.5 h-3.5 text-emerald-400"></i>
+                class="hidden flex-1 sm:flex-none inline-flex items-center justify-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-900 dark:bg-dark-panel dark:hover:bg-dark-surface dark:border dark:border-dark-plum/40 text-white text-xs font-semibold shadow-sm hover:shadow transition-all" title="Save both Resume and Cover Letter to their respective folders">
+                <i data-lucide="folder-archive" class="w-3.5 h-3.5 text-dark-accent"></i>
                 <span>Save Both</span>
               </button>
             </div>
@@ -501,17 +508,17 @@
         </div>
 
         <!-- Preview Viewport (Scrollable Canvas within available height) -->
-        <div id="previewViewport" class="flex-1 min-h-0 bg-slate-100/70 dark:bg-slate-950/60 rounded-lg border border-slate-200/80 dark:border-slate-800/80 overflow-y-auto p-3 sm:p-4 flex flex-col items-center justify-start space-y-6">
+        <div id="previewViewport" class="flex-1 min-h-0 bg-slate-100/70 dark:bg-dark-deep rounded-lg border border-slate-200/80 dark:border-dark-plum/30 overflow-y-auto p-3 sm:p-4 flex flex-col items-center justify-start space-y-6">
           
           <!-- Empty State -->
-          <div id="previewEmptyState" class="my-auto py-12 text-center text-slate-400 space-y-3">
+          <div id="previewEmptyState" class="my-auto py-12 text-center text-slate-400 dark:text-[#94A3B8] space-y-3">
             <div class="w-14 h-14 mx-auto flex items-center justify-center">
               <img src="/static/img/badge-light.png" alt="Resume Builder" class="w-14 h-14 dark:hidden object-contain opacity-80">
               <img src="/static/img/badge-dark.png" alt="Resume Builder" class="w-14 h-14 hidden dark:block object-contain opacity-80">
             </div>
             <div>
-              <p class="text-sm font-medium text-slate-700 dark:text-slate-300">No Document Rendered Yet</p>
-              <p class="text-xs text-slate-400 mt-0.5">Click "Render (CV & Cover Letter)" below to start</p>
+              <p class="text-sm font-medium text-slate-700 dark:text-[#EDF2F7]">No Document Rendered Yet</p>
+              <p class="text-xs text-slate-400 dark:text-[#94A3B8] mt-0.5">Click "Render (CV & Cover Letter)" below to start</p>
             </div>
           </div>
 
@@ -529,8 +536,8 @@
   </main>
 
   <!-- Saved Success Modal -->
-  <div id="successModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+  <div id="successModal" class="fixed inset-0 bg-dark-deep/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-dark-panel rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-dark-plum/40 space-y-4 animate-in fade-in zoom-in-95 duration-150">
       <div class="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto overflow-hidden">
         <img src="/static/img/badge-light.png" alt="Saved" class="w-14 h-14 dark:hidden object-contain">
         <img src="/static/img/badge-dark.png" alt="Saved" class="w-14 h-14 hidden dark:block object-contain">
@@ -538,29 +545,29 @@
       
       <div class="text-center space-y-1">
         <h3 id="modalTitle" class="text-base font-bold text-slate-900 dark:text-white">Documents Successfully Saved!</h3>
-        <p id="modalSubtitle" class="text-xs text-slate-500 dark:text-slate-400">Your documents have been saved to your specified destination.</p>
+        <p id="modalSubtitle" class="text-xs text-slate-500 dark:text-[#94A3B8]">Your documents have been saved to your specified destination.</p>
       </div>
 
-      <div class="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2.5">
+      <div class="p-3 bg-slate-50 dark:bg-dark-surface rounded-xl border border-slate-200 dark:border-dark-plum/40 space-y-2.5">
         <div id="modalResumeGroup">
-          <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Resume Location:</span>
-          <p id="modalSavedPath" class="text-xs font-mono font-medium text-slate-800 dark:text-slate-200 break-all select-all mt-0.5">
+          <span class="text-[10px] text-slate-400 dark:text-[#94A3B8] font-semibold uppercase tracking-wider block">Resume Location:</span>
+          <p id="modalSavedPath" class="text-xs font-mono font-medium text-slate-800 dark:text-[#EDF2F7] break-all select-all mt-0.5">
             /home/vinayak.pastey/Documents/Globathon/Resumes/...
           </p>
         </div>
-        <div id="modalCoverLetterGroup" class="hidden pt-2 border-t border-slate-200 dark:border-slate-700">
-          <span class="text-[10px] text-teal-600 dark:text-teal-400 font-semibold uppercase tracking-wider block">Cover Letter Location:</span>
-          <p id="modalSavedCoverLetterPath" class="text-xs font-mono font-medium text-teal-800 dark:text-teal-200 break-all select-all mt-0.5">
+        <div id="modalCoverLetterGroup" class="hidden pt-2 border-t border-slate-200 dark:border-dark-plum/30">
+          <span class="text-[10px] text-blue-600 dark:text-dark-accent font-semibold uppercase tracking-wider block">Cover Letter Location:</span>
+          <p id="modalSavedCoverLetterPath" class="text-xs font-mono font-medium text-blue-800 dark:text-[#EDF2F7] break-all select-all mt-0.5">
             /home/vinayak.pastey/Documents/Globathon/CoverLetters/...
           </p>
         </div>
       </div>
 
       <div class="flex items-center space-x-2 pt-2">
-        <button id="btnCopySavedPath" type="button" class="flex-1 py-2 px-3 text-xs font-medium rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors">
+        <button id="btnCopySavedPath" type="button" class="flex-1 py-2 px-3 text-xs font-medium rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-dark-surface dark:hover:bg-dark-surface/80 dark:border dark:border-dark-plum/40 text-slate-700 dark:text-[#EDF2F7] transition-colors">
           Copy File Path
         </button>
-        <button id="btnCloseModal" type="button" class="flex-1 py-2 px-3 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors">
+        <button id="btnCloseModal" type="button" class="flex-1 py-2 px-3 text-xs font-semibold rounded-lg bg-dark-accent hover:bg-dark-accentHover text-white transition-colors">
           Done
         </button>
       </div>
@@ -568,25 +575,25 @@
   </div>
 
   <!-- Full Screen Document Preview Modal -->
-  <div id="fullscreenPreviewModal" class="fixed inset-0 bg-black/75 dark:bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 hidden">
+  <div id="fullscreenPreviewModal" class="fixed inset-0 bg-dark-deep/85 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 hidden">
     <!-- Click backdrop to close -->
     <div id="fullscreenBackdrop" class="absolute inset-0 cursor-pointer"></div>
 
-    <div class="relative bg-white dark:bg-slate-900 rounded-2xl w-full max-w-6xl h-[94vh] flex flex-col shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden z-10 animate-in fade-in zoom-in-95 duration-150">
+    <div class="relative bg-white dark:bg-dark-panel rounded-2xl w-full max-w-6xl h-[94vh] flex flex-col shadow-2xl border border-slate-200 dark:border-dark-plum/40 overflow-hidden z-10 animate-in fade-in zoom-in-95 duration-150">
       
       <!-- Modal Header -->
-      <div class="flex-shrink-0 px-3.5 sm:px-5 py-2.5 sm:py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 sm:gap-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur z-20">
+      <div class="flex-shrink-0 px-3.5 sm:px-5 py-2.5 sm:py-3 border-b border-slate-100 dark:border-dark-plum/30 flex items-center justify-between gap-2 sm:gap-4 bg-white/95 dark:bg-dark-panel/95 backdrop-blur z-20">
         
         <!-- Document Indicator & Title -->
         <div class="flex items-center space-x-2.5 min-w-0">
-          <span id="fullscreenDocIcon" class="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 flex items-center justify-center flex-shrink-0">
+          <span id="fullscreenDocIcon" class="p-1.5 rounded-lg bg-blue-50 text-blue-600 dark:bg-dark-surface dark:text-dark-accent flex items-center justify-center flex-shrink-0">
             <i data-lucide="file-text" class="w-4 h-4"></i>
           </span>
           <div class="min-w-0 flex items-center space-x-2">
             <h3 id="fullscreenDocTitle" class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">
               Resume Preview
             </h3>
-            <span id="fullscreenDocPageBadge" class="text-[10px] sm:text-xs font-mono font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex-shrink-0">
+            <span id="fullscreenDocPageBadge" class="text-[10px] sm:text-xs font-mono font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-dark-surface text-slate-600 dark:text-[#EDF2F7] border border-transparent dark:border-dark-plum/30 flex-shrink-0">
               1 page
             </span>
           </div>
@@ -597,29 +604,29 @@
           
           <!-- Document Switcher Button (Show Cover Letter / Show Resume) -->
           <button id="btnFullscreenDocToggle" type="button"
-            class="inline-flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700/80 shadow-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-slate-100 dark:disabled:hover:bg-slate-800"
+            class="inline-flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-dark-surface dark:hover:bg-dark-surface/80 text-slate-800 dark:text-[#EDF2F7] border border-slate-200/80 dark:border-dark-plum/40 shadow-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-slate-100 dark:disabled:hover:bg-dark-surface"
             title="Switch document preview">
-            <i id="fullscreenDocToggleIcon" data-lucide="mail" class="w-3.5 h-3.5 text-teal-600 dark:text-teal-400"></i>
+            <i id="fullscreenDocToggleIcon" data-lucide="mail" class="w-3.5 h-3.5 text-blue-600 dark:text-dark-accent"></i>
             <span id="fullscreenDocToggleLabel">Show Cover Letter</span>
           </button>
 
           <!-- Modal Zoom Controls -->
-          <div class="hidden sm:flex items-center space-x-1 pl-2 border-l border-slate-200 dark:border-slate-800">
-            <button id="btnFullscreenZoomOut" type="button" class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors" title="Zoom Out">
+          <div class="hidden sm:flex items-center space-x-1 pl-2 border-l border-slate-200 dark:border-dark-plum/30">
+            <button id="btnFullscreenZoomOut" type="button" class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-dark-surface text-slate-600 dark:text-[#EDF2F7] transition-colors" title="Zoom Out">
               <i data-lucide="zoom-out" class="w-3.5 h-3.5"></i>
             </button>
-            <span id="fullscreenZoomLevel" class="text-xs font-mono text-slate-500 dark:text-slate-400 min-w-[2.5rem] text-center select-none">100%</span>
-            <button id="btnFullscreenZoomIn" type="button" class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors" title="Zoom In">
+            <span id="fullscreenZoomLevel" class="text-xs font-mono text-slate-500 dark:text-[#94A3B8] min-w-[2.5rem] text-center select-none">100%</span>
+            <button id="btnFullscreenZoomIn" type="button" class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-dark-surface text-slate-600 dark:text-[#EDF2F7] transition-colors" title="Zoom In">
               <i data-lucide="zoom-in" class="w-3.5 h-3.5"></i>
             </button>
-            <button id="btnFullscreenZoomReset" type="button" class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors" title="Reset Zoom (100%)">
+            <button id="btnFullscreenZoomReset" type="button" class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-dark-surface text-slate-600 dark:text-[#EDF2F7] transition-colors" title="Reset Zoom (100%)">
               <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
             </button>
           </div>
 
           <!-- Download PDF in Modal -->
           <a id="btnFullscreenDownloadPdf" href="#" target="_blank" download
-            class="hidden md:inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-xs font-medium text-slate-700 dark:text-slate-200 shadow-sm transition-colors"
+            class="hidden md:inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-white dark:bg-dark-surface border border-slate-200 dark:border-dark-plum/40 hover:bg-slate-50 dark:hover:bg-dark-surface/80 text-xs font-medium text-slate-700 dark:text-[#EDF2F7] shadow-sm transition-colors"
             title="Download PDF">
             <i data-lucide="download" class="w-3.5 h-3.5"></i>
             <span>PDF</span>
@@ -627,7 +634,7 @@
 
           <!-- Close Modal Button -->
           <button id="btnCloseFullscreenModal" type="button"
-            class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-dark-surface transition-colors"
             title="Close Preview (Esc)">
             <i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i>
           </button>
@@ -635,7 +642,7 @@
       </div>
 
       <!-- Scrollable Preview Viewport -->
-      <div id="fullscreenPreviewViewport" class="flex-1 min-h-0 bg-slate-100/70 dark:bg-slate-950/70 overflow-y-auto p-4 sm:p-8 flex flex-col items-center justify-start space-y-8 select-none">
+      <div id="fullscreenPreviewViewport" class="flex-1 min-h-0 bg-slate-100/70 dark:bg-dark-deep overflow-y-auto p-4 sm:p-8 flex flex-col items-center justify-start space-y-8 select-none">
         <div id="fullscreenPagesContainer" class="flex flex-col items-center space-y-8 w-full max-w-4xl transition-transform duration-150 origin-top">
           <!-- Rendered document preview pages inserted dynamically -->
         </div>
@@ -645,14 +652,14 @@
   </div>
 
   <!-- Minimalist Fixed Footer -->
-  <footer class="flex-shrink-0 border-t border-slate-200/80 dark:border-slate-800/80 py-2 sm:py-2.5 text-center text-xs text-slate-500 dark:text-slate-400 flex flex-col sm:flex-row items-center justify-center space-y-0.5 sm:space-y-0 sm:space-x-3 bg-white/50 dark:bg-slate-900/50 backdrop-blur">
+  <footer class="flex-shrink-0 border-t border-slate-200/80 dark:border-dark-plum/30 py-2 sm:py-2.5 text-center text-xs text-slate-500 dark:text-[#94A3B8] flex flex-col sm:flex-row items-center justify-center space-y-0.5 sm:space-y-0 sm:space-x-3 bg-white/50 dark:bg-dark-panel/90 backdrop-blur">
     <span>RenderCV CLI Wrapper &middot; Clean engineering resume pipeline</span>
-    <span class="hidden sm:inline text-slate-300 dark:text-slate-700">&bull;</span>
-    <span class="inline-flex items-center space-x-1 text-slate-600 dark:text-slate-300 font-medium">
+    <span class="hidden sm:inline text-slate-300 dark:text-dark-plum">&bull;</span>
+    <span class="inline-flex items-center space-x-1 text-slate-600 dark:text-[#EDF2F7] font-medium">
       <span>Made with</span>
       <span class="text-rose-500 text-xs">❤️</span>
       <span>by</span>
-      <span class="font-semibold text-slate-800 dark:text-slate-100">Vinayak Pastey</span>
+      <span class="font-semibold text-slate-800 dark:text-white">Vinayak Pastey</span>
     </span>
   </footer>
 

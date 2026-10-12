@@ -1,4 +1,43 @@
-/* Modern, clean custom styling for resume_builder */
+/* Styling for resume_builder following personal_os design system
+   Dark theme: comfortable mid-dark GitHub-inspired palette:
+   - background:  hsl(213 27% 8%)  -> #0F141A (page background)
+   - card/panel:  hsl(213 27% 10%) -> #131920 (cards & panels)
+   - secondary:   hsl(213 27% 14%) -> #1A232D (inner wells & elevated surfaces)
+   - accent:      hsl(213 27% 16%) -> #1E2834 (hover & pill active surfaces)
+   - border:      hsl(213 27% 18%) -> #222D3A (subtle borders & inputs)
+   - primary:     hsl(217 91% 65%) -> #5593F7 (electric blue accent / CTAs)
+   - foreground:  hsl(210 40% 95%) -> #EDF2F7 (high-contrast text)
+   - muted:       hsl(215 20% 65%) -> #94A3B8 (subtle text / labels)
+*/
+
+:root {
+  --background: #f8fafc;
+  --foreground: #020817;
+  --card: #ffffff;
+  --card-foreground: #020817;
+  --secondary: #f1f5f9;
+  --accent: #e2e8f0;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --ring: #2563eb;
+}
+
+.dark {
+  color-scheme: dark;
+  --background: #0F141A;
+  --foreground: #EDF2F7;
+  --card: #131920;
+  --card-foreground: #EDF2F7;
+  --secondary: #1A232D;
+  --accent: #1E2834;
+  --border: #222D3A;
+  --input: #222D3A;
+  --primary: #5593F7;
+  --primary-hover: #327DF5;
+  --ring: #5593F7;
+}
 
 /* Custom scrollbars */
 ::-webkit-scrollbar {
@@ -19,6 +58,15 @@
   background: rgba(100, 116, 139, 0.6);
 }
 
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(34, 45, 58, 0.7);
+  border-radius: 9999px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(85, 147, 247, 0.5);
+}
+
 /* Page Paper styling for rendered resume previews */
 .resume-page-sheet {
   background: white;
@@ -30,8 +78,8 @@
 }
 
 .dark .resume-page-sheet {
-  border: 1px solid rgba(51, 65, 85, 0.6);
-  box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(34, 45, 58, 0.85);
+  box-shadow: 0 12px 36px -6px rgba(0, 0, 0, 0.7), 0 6px 14px -3px rgba(15, 20, 26, 0.85);
 }
 
 /* 1-Line Stepper Pills */
@@ -40,11 +88,11 @@
 }
 
 .step-pill.completed {
-  box-shadow: 0 1px 2px 0 rgba(16, 185, 129, 0.15);
+  box-shadow: 0 1px 2px 0 rgba(85, 147, 247, 0.25);
 }
 
 .step-pill.running {
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35);
+  box-shadow: 0 0 0 2px rgba(85, 147, 247, 0.45);
 }
 
 /* Subtle focus rings */

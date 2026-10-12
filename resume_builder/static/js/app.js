@@ -366,24 +366,24 @@ document.addEventListener("DOMContentLoaded", () => {
     stepIds.forEach((id, idx) => {
       const el = document.getElementById(`step-${id}`);
       if (el) {
-        el.className = "step-pill flex items-center space-x-1.5 px-2 py-1 rounded-md bg-slate-200/70 dark:bg-slate-800 text-slate-500 text-[11px] font-medium transition-all";
+        el.className = "step-pill flex items-center space-x-1.5 px-2 py-1 rounded-md bg-slate-200/70 dark:bg-dark-surface/60 text-slate-500 dark:text-[#94A3B8] text-[11px] font-medium transition-all";
         const icon = el.querySelector(".step-icon");
         if (icon) {
-          icon.className = "step-icon w-4 h-4 rounded-full bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center text-[10px]";
+          icon.className = "step-icon w-4 h-4 rounded-full bg-slate-300 dark:bg-dark-panel text-slate-600 dark:text-[#EDF2F7] flex items-center justify-center text-[10px]";
           icon.innerHTML = (idx + 1).toString();
         }
       }
       const line = document.getElementById(`step-line-${idx + 1}`);
       if (line) {
-        line.className = "flex-1 h-0.5 min-w-[6px] bg-slate-200 dark:bg-slate-700 transition-colors";
+        line.className = "flex-1 h-0.5 min-w-[6px] bg-slate-200 dark:bg-dark-plum/30 transition-colors";
       }
     });
 
     if (stepTickerText) stepTickerText.textContent = "Ready to render";
-    if (stepTickerDot) stepTickerDot.className = "w-2 h-2 rounded-full bg-slate-400 flex-shrink-0";
+    if (stepTickerDot) stepTickerDot.className = "w-2 h-2 rounded-full bg-slate-400 dark:bg-dark-plum flex-shrink-0";
     if (pipelineStatusBadge) {
       pipelineStatusBadge.textContent = "Idle";
-      pipelineStatusBadge.className = "inline-flex items-center px-2 py-0.2 text-[10px] font-medium rounded-full bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400";
+      pipelineStatusBadge.className = "inline-flex items-center px-2 py-0.2 text-[10px] font-medium rounded-full bg-slate-100 text-slate-600 dark:bg-dark-surface dark:text-[#94A3B8]";
     }
     if (metricsReviewCard) metricsReviewCard.classList.add("hidden");
     if (btnSaveBoth) btnSaveBoth.classList.add("hidden");
@@ -403,35 +403,35 @@ document.addEventListener("DOMContentLoaded", () => {
     const icon = el.querySelector(".step-icon");
 
     if (step.status === "completed") {
-      el.className = "step-pill flex items-center space-x-1.5 px-2 py-1 rounded-md bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-200 text-[11px] font-semibold border border-emerald-300 dark:border-emerald-800/60 transition-all";
+      el.className = "step-pill flex items-center space-x-1.5 px-2 py-1 rounded-md bg-blue-50 dark:bg-dark-accent/15 text-blue-800 dark:text-blue-200 text-[11px] font-semibold border border-blue-200 dark:border-dark-accent/40 transition-all";
       if (icon) {
-        icon.className = "step-icon w-4 h-4 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px]";
+        icon.className = "step-icon w-4 h-4 rounded-full bg-dark-accent text-white flex items-center justify-center text-[10px]";
         icon.innerHTML = '<i data-lucide="check" class="w-3 h-3"></i>';
       }
       const line = document.getElementById(`step-line-${idx + 1}`);
       if (line) {
-        line.className = "flex-1 h-0.5 min-w-[6px] bg-emerald-500 transition-colors";
+        line.className = "flex-1 h-0.5 min-w-[6px] bg-dark-accent transition-colors";
       }
       if (stepTickerText) {
         stepTickerText.textContent = `✓ Step ${idx + 1}: ${step.name} (${step.duration_ms || 0} ms)`;
       }
       if (stepTickerDot) {
-        stepTickerDot.className = "w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0";
+        stepTickerDot.className = "w-2 h-2 rounded-full bg-dark-accent flex-shrink-0";
       }
     } else if (step.status === "running") {
-      el.className = "step-pill flex items-center space-x-1.5 px-2 py-1 rounded-md bg-emerald-500 text-white text-[11px] font-semibold shadow-sm transition-all animate-pulse";
+      el.className = "step-pill flex items-center space-x-1.5 px-2 py-1 rounded-md bg-dark-accent text-white text-[11px] font-semibold shadow-sm transition-all animate-pulse";
       if (icon) {
-        icon.className = "step-icon w-4 h-4 rounded-full bg-white text-emerald-700 flex items-center justify-center text-[10px] animate-spin";
+        icon.className = "step-icon w-4 h-4 rounded-full bg-white text-dark-accent flex items-center justify-center text-[10px] animate-spin";
         icon.innerHTML = '<i data-lucide="loader-2" class="w-3 h-3"></i>';
       }
       if (stepTickerText) {
         stepTickerText.textContent = `Running ${step.name}...`;
       }
       if (stepTickerDot) {
-        stepTickerDot.className = "w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0 animate-ping";
+        stepTickerDot.className = "w-2 h-2 rounded-full bg-dark-accent flex-shrink-0 animate-ping";
       }
     } else if (step.status === "failed") {
-      el.className = "step-pill flex items-center space-x-1.5 px-2 py-1 rounded-md bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300 text-[11px] font-semibold border border-red-300 dark:border-red-800 transition-all";
+      el.className = "step-pill flex items-center space-x-1.5 px-2 py-1 rounded-md bg-red-100 dark:bg-red-950/70 text-red-700 dark:text-red-300 text-[11px] font-semibold border border-red-300 dark:border-red-900 transition-all";
       if (icon) {
         icon.className = "step-icon w-4 h-4 rounded-full bg-red-500 text-white flex items-center justify-center text-[10px]";
         icon.innerHTML = '<i data-lucide="x" class="w-3 h-3"></i>';
@@ -476,7 +476,7 @@ document.addEventListener("DOMContentLoaded", () => {
     btnRenderResume.disabled = true;
     lblRenderBtnText.textContent = "Rendering...";
     pipelineStatusBadge.textContent = "Executing...";
-    pipelineStatusBadge.className = "inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 animate-pulse";
+    pipelineStatusBadge.className = "inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-blue-100 text-blue-800 dark:bg-dark-accent/20 dark:text-blue-300 animate-pulse";
 
     const payload = {
       yaml_content: yamlContent,
@@ -534,7 +534,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (lblCoverLetterFilenamePreview) lblCoverLetterFilenamePreview.textContent = currentResolvedCoverLetterFilename;
 
       pipelineStatusBadge.textContent = "Rendered";
-      pipelineStatusBadge.className = "inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300";
+      pipelineStatusBadge.className = "inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-blue-100 text-blue-800 dark:bg-dark-accent/20 dark:text-blue-300";
 
       currentRenderData = data;
 
@@ -546,7 +546,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (tabResumeBadge) tabResumeBadge.textContent = `${data.metrics?.page_count || 1} pg`;
         if (tabCoverLetterBadge) {
           tabCoverLetterBadge.textContent = `${data.cover_letter_metrics?.page_count || 1} pg`;
-          tabCoverLetterBadge.className = "text-[9px] px-1.5 py-0.2 rounded-full bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300 font-medium";
+          tabCoverLetterBadge.className = "text-[9px] px-1.5 py-0.2 rounded-full bg-slate-200 text-slate-700 dark:bg-dark-panel dark:text-[#EDF2F7] font-medium";
         }
         if (btnSaveBoth) btnSaveBoth.classList.remove("hidden");
         if (stepTickerText) {
@@ -556,7 +556,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (tabResumeBadge) tabResumeBadge.textContent = `${data.metrics?.page_count || 1} pg`;
         if (tabCoverLetterBadge) {
           tabCoverLetterBadge.textContent = "None";
-          tabCoverLetterBadge.className = "text-[9px] px-1.5 py-0.2 rounded-full bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500 font-medium";
+          tabCoverLetterBadge.className = "text-[9px] px-1.5 py-0.2 rounded-full bg-slate-100 text-slate-400 dark:bg-dark-surface dark:text-[#94A3B8] font-medium";
         }
         if (btnSaveBoth) btnSaveBoth.classList.add("hidden");
         if (stepTickerText) {
@@ -565,7 +565,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       if (stepTickerDot) {
-        stepTickerDot.className = "w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0";
+        stepTickerDot.className = "w-2 h-2 rounded-full bg-dark-accent flex-shrink-0";
       }
 
       metricsReviewCard.classList.remove("hidden");
@@ -587,11 +587,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const isResume = activeDocTab === "resume";
     if (tabResume && tabCoverLetter) {
       if (isResume) {
-        tabResume.className = "cursor-pointer inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm border border-slate-200/60 dark:border-slate-700/60 transition-all";
-        tabCoverLetter.className = "cursor-pointer inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-md text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all";
+        tabResume.className = "cursor-pointer inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-white dark:bg-dark-surface text-slate-900 dark:text-white shadow-sm border border-slate-200/60 dark:border-dark-plum/40 transition-all";
+        tabCoverLetter.className = "cursor-pointer inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-md text-xs font-medium text-slate-500 dark:text-[#94A3B8] hover:text-slate-900 dark:hover:text-white transition-all";
       } else {
-        tabResume.className = "cursor-pointer inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-md text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all";
-        tabCoverLetter.className = "cursor-pointer inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-white dark:bg-slate-900 text-teal-700 dark:text-teal-300 shadow-sm border border-slate-200/60 dark:border-slate-700/60 transition-all";
+        tabResume.className = "cursor-pointer inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-md text-xs font-medium text-slate-500 dark:text-[#94A3B8] hover:text-slate-900 dark:hover:text-white transition-all";
+        tabCoverLetter.className = "cursor-pointer inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-white dark:bg-dark-surface text-blue-700 dark:text-white shadow-sm border border-slate-200/60 dark:border-dark-plum/40 transition-all";
       }
     }
   };
@@ -671,10 +671,10 @@ document.addEventListener("DOMContentLoaded", () => {
       metricPageCount.textContent = pages;
       if (pages === 1) {
         metricPageBadge.textContent = "Single Page";
-        metricPageBadge.className = "inline-block mt-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300";
+        metricPageBadge.className = "inline-block mt-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 dark:bg-dark-accent/20 dark:text-blue-300";
       } else {
         metricPageBadge.textContent = `${pages} Pages`;
-        metricPageBadge.className = "inline-block mt-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300";
+        metricPageBadge.className = "inline-block mt-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-200 text-slate-800 dark:bg-dark-surface dark:text-[#EDF2F7] border border-transparent dark:border-dark-plum/30";
       }
 
       metricTotalWords.textContent = totalWords.toLocaleString();
@@ -699,7 +699,7 @@ document.addEventListener("DOMContentLoaded", () => {
         pageWrapper.className = "relative flex flex-col items-center w-full max-w-[800px]";
 
         const pageHeader = document.createElement("div");
-        pageHeader.className = "w-full flex items-center justify-between pb-1.5 px-1 text-[11px] text-slate-400 font-mono";
+        pageHeader.className = "w-full flex items-center justify-between pb-1.5 px-1 text-[11px] text-slate-400 dark:text-[#94A3B8] font-mono";
         pageHeader.innerHTML = `<span>${docTitle} &middot; Page ${idx + 1} of ${urls.length}</span><span>${metrics?.page_words?.[idx] || metrics?.total_words || 0} words</span>`;
 
         const img = document.createElement("img");
@@ -781,9 +781,7 @@ document.addEventListener("DOMContentLoaded", () => {
       fullscreenDocPageBadge.textContent = `${pageCount} ${pageCount === 1 ? "page" : "pages"}`;
     }
     if (fullscreenDocIcon) {
-      fullscreenDocIcon.className = isResume
-        ? "p-1.5 rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 flex items-center justify-center flex-shrink-0"
-        : "p-1.5 rounded-lg bg-teal-50 text-teal-600 dark:bg-teal-950/60 dark:text-teal-400 flex items-center justify-center flex-shrink-0";
+      fullscreenDocIcon.className = "p-1.5 rounded-lg bg-blue-50 text-blue-600 dark:bg-dark-surface dark:text-dark-accent flex items-center justify-center flex-shrink-0";
       fullscreenDocIcon.innerHTML = `<i data-lucide="${isResume ? 'file-text' : 'mail'}" class="w-4 h-4"></i>`;
     }
 
@@ -811,35 +809,35 @@ document.addEventListener("DOMContentLoaded", () => {
         if (fullscreenDocToggleLabel) fullscreenDocToggleLabel.textContent = "Show Cover Letter";
         if (fullscreenDocToggleIcon) {
           fullscreenDocToggleIcon.setAttribute("data-lucide", "mail");
-          fullscreenDocToggleIcon.className = "w-3.5 h-3.5 text-teal-600 dark:text-teal-400";
+          fullscreenDocToggleIcon.className = "w-3.5 h-3.5 text-blue-600 dark:text-dark-accent";
         }
         if (!hasCoverLetter) {
           btnFullscreenDocToggle.disabled = true;
           btnFullscreenDocToggle.title = "No cover letter available in current document";
           btnFullscreenDocToggle.classList.add("opacity-40", "cursor-not-allowed");
-          btnFullscreenDocToggle.classList.remove("hover:bg-slate-200", "dark:hover:bg-slate-700", "cursor-pointer");
+          btnFullscreenDocToggle.classList.remove("hover:bg-slate-200", "dark:hover:bg-dark-surface/80", "cursor-pointer");
         } else {
           btnFullscreenDocToggle.disabled = false;
           btnFullscreenDocToggle.title = "Switch to Cover Letter preview";
           btnFullscreenDocToggle.classList.remove("opacity-40", "cursor-not-allowed");
-          btnFullscreenDocToggle.classList.add("hover:bg-slate-200", "dark:hover:bg-slate-700", "cursor-pointer");
+          btnFullscreenDocToggle.classList.add("hover:bg-slate-200", "dark:hover:bg-dark-surface/80", "cursor-pointer");
         }
       } else {
         if (fullscreenDocToggleLabel) fullscreenDocToggleLabel.textContent = "Show Resume";
         if (fullscreenDocToggleIcon) {
           fullscreenDocToggleIcon.setAttribute("data-lucide", "file-text");
-          fullscreenDocToggleIcon.className = "w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400";
+          fullscreenDocToggleIcon.className = "w-3.5 h-3.5 text-blue-600 dark:text-dark-accent";
         }
         if (!hasResume) {
           btnFullscreenDocToggle.disabled = true;
           btnFullscreenDocToggle.title = "No resume available in current document";
           btnFullscreenDocToggle.classList.add("opacity-40", "cursor-not-allowed");
-          btnFullscreenDocToggle.classList.remove("hover:bg-slate-200", "dark:hover:bg-slate-700", "cursor-pointer");
+          btnFullscreenDocToggle.classList.remove("hover:bg-slate-200", "dark:hover:bg-dark-surface/80", "cursor-pointer");
         } else {
           btnFullscreenDocToggle.disabled = false;
           btnFullscreenDocToggle.title = "Switch to Resume preview";
           btnFullscreenDocToggle.classList.remove("opacity-40", "cursor-not-allowed");
-          btnFullscreenDocToggle.classList.add("hover:bg-slate-200", "dark:hover:bg-slate-700", "cursor-pointer");
+          btnFullscreenDocToggle.classList.add("hover:bg-slate-200", "dark:hover:bg-dark-surface/80", "cursor-pointer");
         }
       }
     }
@@ -853,7 +851,7 @@ document.addEventListener("DOMContentLoaded", () => {
           pageWrapper.className = "relative flex flex-col items-center w-full max-w-4xl";
 
           const pageHeader = document.createElement("div");
-          pageHeader.className = "w-full flex items-center justify-between pb-2 px-1 text-xs text-slate-500 dark:text-slate-400 font-mono";
+          pageHeader.className = "w-full flex items-center justify-between pb-2 px-1 text-xs text-slate-500 dark:text-[#94A3B8] font-mono";
           pageHeader.innerHTML = `<span>${docTitle} &middot; Page ${idx + 1} of ${urls.length}</span><span>${metrics?.page_words?.[idx] || metrics?.total_words || 0} words</span>`;
 
           const img = document.createElement("img");
@@ -1070,7 +1068,7 @@ document.addEventListener("DOMContentLoaded", () => {
         alert("Save Both Failed: " + err.message);
       } finally {
         btnSaveBoth.disabled = false;
-        btnSaveBoth.innerHTML = '<i data-lucide="folder-archive" class="w-3.5 h-3.5 mr-1.5 text-emerald-400"></i><span>Save Both</span>';
+        btnSaveBoth.innerHTML = '<i data-lucide="folder-archive" class="w-3.5 h-3.5 mr-1.5 text-blue-500 dark:text-dark-accent"></i><span>Save Both</span>';
         if (window.lucide) window.lucide.createIcons();
       }
     });
