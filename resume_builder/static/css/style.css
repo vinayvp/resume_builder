@@ -99,3 +99,38 @@
 input:focus, select:focus, textarea:focus {
   outline: none;
 }
+
+/* PDF.js Page Sheet & Text Layer Styles */
+.pdf-page-sheet {
+  position: relative;
+  background: white;
+}
+
+.pdf-page-sheet canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Custom selection highlight for PDF.js text layer - override pdf.js default 0.25 opacity */
+.textLayer {
+  opacity: 1 !important;
+}
+
+.textLayer ::selection {
+  background: rgba(85, 147, 247, 0.5) !important;
+  color: transparent !important;
+}
+
+.textLayer ::-moz-selection {
+  background: rgba(85, 147, 247, 0.5) !important;
+  color: transparent !important;
+}
+
+.textLayer br::selection {
+  background: transparent !important;
+}
+
+.textLayer br::-moz-selection {
+  background: transparent !important;
+}

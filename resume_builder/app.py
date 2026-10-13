@@ -228,7 +228,7 @@ async def get_preview_cover_letter_page(token: str, page_num: int):
 @app.get("/api/preview/{token}/pdf")
 async def get_preview_pdf(token: str):
     """
-    Serves the rendered PDF file for download or direct browser viewing.
+    Serves the rendered PDF file for direct browser viewing and download.
     """
     pdf_path = CACHE_DIR / token / "resume.pdf"
     if not pdf_path.exists():
@@ -236,6 +236,7 @@ async def get_preview_pdf(token: str):
     return FileResponse(
         pdf_path,
         media_type="application/pdf",
+        content_disposition_type="inline",
         filename="resume.pdf",
     )
 
@@ -243,7 +244,7 @@ async def get_preview_pdf(token: str):
 @app.get("/api/preview/{token}/cover-letter-pdf")
 async def get_preview_cover_letter_pdf(token: str):
     """
-    Serves the rendered Cover Letter PDF file for download or direct browser viewing.
+    Serves the rendered Cover Letter PDF file for direct browser viewing and download.
     """
     pdf_path = CACHE_DIR / token / "cover_letter.pdf"
     if not pdf_path.exists():
@@ -251,6 +252,7 @@ async def get_preview_cover_letter_pdf(token: str):
     return FileResponse(
         pdf_path,
         media_type="application/pdf",
+        content_disposition_type="inline",
         filename="cover_letter.pdf",
     )
 

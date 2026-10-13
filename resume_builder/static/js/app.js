@@ -753,6 +753,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // Full Screen Preview Modal Logic
   // -------------------------------------------------------------
   let fullscreenZoom = 100;
+  let fullscreenRenderToken = 0;
+
+  // Initialize PDF.js worker
+  if (window.pdfjsLib) {
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc = "/static/vendor/pdf.worker.min.js";
+  }
 
   const applyFullscreenZoom = () => {
     if (fullscreenPagesContainer) {
@@ -760,6 +766,117 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (fullscreenZoomLevel) {
       fullscreenZoomLevel.textContent = `${fullscreenZoom}%`;
+    }
+  };
+
+  const renderFullscreenWithPdfJs = async (pdfUrl, docTitle, metrics, fallbackUrls) => {
+    const renderToken = ++fullscreenRenderToken;
+    if (!fullscreenPagesContainer) return;
+
+    fullscreenPagesContainer.innerHTML = `
+      <div class="py-16 text-center text-slate-400 text-sm flex flex-col items-center justify-center space-y-2.5">
+        <div class="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <span class="font-mono text-xs">Loading document...</span>
+      </div>
+    `;
+
+    try {
+      if (!window.pdfjsLib) {
+        throw new Error("pdfjsLib is not available");
+      }
+
+      const loadingTask = window.pdfjsLib.getDocument(pdfUrl);
+      const pdf = await loadingTask.promise;
+      if (renderToken !== fullscreenRenderToken) return;
+
+      fullscreenPagesContainer.innerHTML = "";
+
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        if (renderToken !== fullscreenRenderToken) return;
+
+        const pageWrapper = document.createElement("div");
+        pageWrapper.className = "relative flex flex-col items-center w-full max-w-4xl select-text";
+
+        const pageHeader = document.createElement("div");
+        pageHeader.className = "w-full flex items-center justify-between pb-2 px-1 text-xs text-slate-500 dark:text-[#94A3B8] font-mono select-none";
+        const pageWords = metrics?.page_words?.[pageNum - 1] || (pageNum === 1 ? metrics?.total_words : 0) || 0;
+        pageHeader.innerHTML = `<span>${docTitle} &middot; Page ${pageNum} of ${pdf.numPages}</span><span>${pageWords} words</span>`;
+
+        // Page container for canvas and transparent text layer
+        const pageSheet = document.createElement("div");
+        pageSheet.className = "relative pdf-page-sheet resume-page-sheet shadow-2xl rounded-sm overflow-hidden select-text";
+
+        // Scale factor: 1.5 provides high crispness without excessive memory
+        const scale = 1.5;
+        const viewport = page.getViewport({ scale });
+
+        const canvas = document.createElement("canvas");
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        canvas.className = "block w-full h-auto";
+        const canvasContext = canvas.getContext("2d");
+
+        await page.render({ canvasContext, viewport }).promise;
+        if (renderToken !== fullscreenRenderToken) return;
+
+        // Overlay text layer for text selection & copying
+        const textLayerDiv = document.createElement("div");
+        textLayerDiv.className = "textLayer";
+        textLayerDiv.style.width = `${viewport.width}px`;
+        textLayerDiv.style.height = `${viewport.height}px`;
+        textLayerDiv.style.setProperty("--scale-factor", viewport.scale);
+
+        const textContent = await page.getTextContent();
+        if (renderToken !== fullscreenRenderToken) return;
+
+        await window.pdfjsLib.renderTextLayer({
+          textContentSource: textContent,
+          container: textLayerDiv,
+          viewport: viewport,
+          textDivs: []
+        }).promise;
+
+        pageSheet.appendChild(canvas);
+        pageSheet.appendChild(textLayerDiv);
+
+        pageWrapper.appendChild(pageHeader);
+        pageWrapper.appendChild(pageSheet);
+        fullscreenPagesContainer.appendChild(pageWrapper);
+      }
+    } catch (err) {
+      console.warn("[ResumeBuilder] PDF.js rendering error, using fallback images:", err);
+      if (renderToken !== fullscreenRenderToken) return;
+      renderFullscreenImageFallback(fallbackUrls, docTitle, metrics);
+    }
+  };
+
+  const renderFullscreenImageFallback = (urls, docTitle, metrics) => {
+    if (!fullscreenPagesContainer) return;
+    fullscreenPagesContainer.innerHTML = "";
+    if (urls && urls.length > 0) {
+      urls.forEach((url, idx) => {
+        const pageWrapper = document.createElement("div");
+        pageWrapper.className = "relative flex flex-col items-center w-full max-w-4xl";
+
+        const pageHeader = document.createElement("div");
+        pageHeader.className = "w-full flex items-center justify-between pb-2 px-1 text-xs text-slate-500 dark:text-[#94A3B8] font-mono";
+        pageHeader.innerHTML = `<span>${docTitle} &middot; Page ${idx + 1} of ${urls.length}</span><span>${metrics?.page_words?.[idx] || metrics?.total_words || 0} words</span>`;
+
+        const img = document.createElement("img");
+        img.src = `${url}?t=${Date.now()}`;
+        img.alt = `${docTitle} Page ${idx + 1}`;
+        img.className = "resume-page-sheet w-full shadow-2xl rounded-sm";
+
+        pageWrapper.appendChild(pageHeader);
+        pageWrapper.appendChild(img);
+        fullscreenPagesContainer.appendChild(pageWrapper);
+      });
+    } else {
+      const emptyMsg = document.createElement("div");
+      emptyMsg.className = "py-16 text-center text-slate-400 text-sm";
+      emptyMsg.textContent = `No ${docTitle} preview available.`;
+      fullscreenPagesContainer.appendChild(emptyMsg);
     }
   };
 
@@ -771,6 +888,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const urls = isResume ? currentRenderData.preview_urls : currentRenderData.cover_letter_preview_urls;
     const metrics = isResume ? currentRenderData.metrics : currentRenderData.cover_letter_metrics;
     const resolvedName = isResume ? currentResolvedFilename : currentResolvedCoverLetterFilename;
+    const pdfUrl = isResume ? currentRenderData.pdf_preview_url : currentRenderData.cover_letter_pdf_url;
 
     // 1. Title, badge, icon
     if (fullscreenDocTitle) {
@@ -787,7 +905,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 2. Modal PDF Download link
     if (btnFullscreenDownloadPdf) {
-      btnFullscreenDownloadPdf.href = isResume ? currentRenderData.pdf_preview_url : currentRenderData.cover_letter_pdf_url;
+      btnFullscreenDownloadPdf.href = pdfUrl || "#";
       btnFullscreenDownloadPdf.download = resolvedName;
     }
 
@@ -796,12 +914,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // When in Cover Letter: show "Show Resume" button. Disabled if resume doesn't exist.
     const hasCoverLetter = Boolean(
       currentRenderData.has_cover_letter &&
-      currentRenderData.cover_letter_preview_urls &&
-      currentRenderData.cover_letter_preview_urls.length > 0
+      (currentRenderData.cover_letter_pdf_url || (currentRenderData.cover_letter_preview_urls && currentRenderData.cover_letter_preview_urls.length > 0))
     );
     const hasResume = Boolean(
-      currentRenderData.preview_urls &&
-      currentRenderData.preview_urls.length > 0
+      currentRenderData.pdf_preview_url || (currentRenderData.preview_urls && currentRenderData.preview_urls.length > 0)
     );
 
     if (btnFullscreenDocToggle) {
@@ -842,33 +958,11 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // 4. Render Pages inside Modal
-    if (fullscreenPagesContainer) {
-      fullscreenPagesContainer.innerHTML = "";
-      if (urls && urls.length > 0) {
-        urls.forEach((url, idx) => {
-          const pageWrapper = document.createElement("div");
-          pageWrapper.className = "relative flex flex-col items-center w-full max-w-4xl";
-
-          const pageHeader = document.createElement("div");
-          pageHeader.className = "w-full flex items-center justify-between pb-2 px-1 text-xs text-slate-500 dark:text-[#94A3B8] font-mono";
-          pageHeader.innerHTML = `<span>${docTitle} &middot; Page ${idx + 1} of ${urls.length}</span><span>${metrics?.page_words?.[idx] || metrics?.total_words || 0} words</span>`;
-
-          const img = document.createElement("img");
-          img.src = `${url}?t=${Date.now()}`;
-          img.alt = `${docTitle} Page ${idx + 1}`;
-          img.className = "resume-page-sheet w-full shadow-2xl rounded-sm";
-
-          pageWrapper.appendChild(pageHeader);
-          pageWrapper.appendChild(img);
-          fullscreenPagesContainer.appendChild(pageWrapper);
-        });
-      } else {
-        const emptyMsg = document.createElement("div");
-        emptyMsg.className = "py-16 text-center text-slate-400 text-sm";
-        emptyMsg.textContent = `No ${docTitle} preview available.`;
-        fullscreenPagesContainer.appendChild(emptyMsg);
-      }
+    // 4. Render Pages inside Modal with Selectable Text (via PDF.js)
+    if (pdfUrl) {
+      renderFullscreenWithPdfJs(pdfUrl, docTitle, metrics, urls);
+    } else {
+      renderFullscreenImageFallback(urls, docTitle, metrics);
     }
 
     if (window.lucide) {
@@ -894,6 +988,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const closeFullscreenModal = () => {
+    fullscreenRenderToken++;
     if (fullscreenPreviewModal) {
       fullscreenPreviewModal.classList.add("hidden");
     }
